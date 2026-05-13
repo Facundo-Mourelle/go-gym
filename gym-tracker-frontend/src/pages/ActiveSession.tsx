@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSessionStore } from '../store/sessionStore';
 import { sessionsApi } from '../api/sessions';
 import { routinesApi } from '../api/routines';
+import { workoutsApi } from '../api/workouts';
 import { exercisesApi } from '../api/exercises';
 import { SetRecorder } from '../components/session/SetRecorder';
 import { CompletedSets } from '../components/session/CompletedSets';
@@ -31,6 +32,7 @@ export const ActiveSession: React.FC = () => {
     const [routinePatterns, setRoutinePatterns] = useState<string[]>([]);
     const [lastSessionMap, setLastSessionMap] = useState<Map<string, { reps: number; weight: number }>>(new Map());
     const routineSetupDone = useRef(false);
+    const workoutSetupDone = useRef(false);
 
     // Start session on mount if none exists
     useEffect(() => {
@@ -63,6 +65,31 @@ export const ActiveSession: React.FC = () => {
                 }
             };
             setupFromRoutine();
+        }
+    }, [searchParams, activeSession]);
+
+    useEffect(() => {
+        const workoutId = searchParams.get('workoutId');
+        if (workoutId && activeSession && !workoutSetupDone.current) {
+            workoutSetupDone.current = true;
+            const setupFromWorkout = async () => {
+                try {
+                    const workout = await workoutsApi.get(workoutId);
+                    if (workout.Exercises && workout.Exercises.length > 0) {
+                        const allExercises = await exercisesApi.list();
+                        const exerciseIds = new Set(workout.Exercises.map(ex => ex.ExerciseID));
+                        const matched = allExercises.filter(ex => exerciseIds.has(ex.id));
+
+                        if (matched.length > 0) {
+                            prepopulateExercises(matched.map(ex => ({ id: ex.id, name: ex.name })));
+                            setSelectedExercise(matched[0]);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Failed to setup from workout:', error);
+                }
+            };
+            setupFromWorkout();
         }
     }, [searchParams, activeSession]);
 

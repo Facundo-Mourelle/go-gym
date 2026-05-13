@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { workoutsApi } from '../api/workouts';
 import type { WorkoutSummary } from '../types/workout';
-import { Plus, Calendar, Dumbbell, ChevronRight, List } from 'lucide-react';
+import { Plus, Calendar, Dumbbell, Play, Pencil, Trash2, List } from 'lucide-react';
 
 export const Workouts: React.FC = () => {
     const navigate = useNavigate();
@@ -22,6 +22,16 @@ export const Workouts: React.FC = () => {
         };
         fetchWorkouts();
     }, []);
+
+    const handleDelete = async (id: string, name: string) => {
+        if (!window.confirm(`Are you sure you want to delete "${name}"?`)) return;
+        try {
+            await workoutsApi.delete(id);
+            setWorkouts(prev => prev.filter(w => w.ID !== id));
+        } catch (error) {
+            console.error('Failed to delete workout:', error);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-gray-900 text-white p-6">
@@ -61,8 +71,7 @@ export const Workouts: React.FC = () => {
                     {workouts.map((workout) => (
                         <div 
                             key={workout.ID} 
-                            onClick={() => navigate(`/create-workout?id=${workout.ID}`)}
-                            className="bg-gray-800 p-5 rounded-lg border border-gray-700 hover:border-blue-500/50 hover:bg-gray-750 transition-all cursor-pointer"
+                            className="bg-gray-800 p-5 rounded-lg border border-gray-700 transition-all"
                         >
                             <div className="flex justify-between items-start">
                                 <div className="flex-1">
@@ -84,7 +93,30 @@ export const Workouts: React.FC = () => {
                                         <span>Created {new Date(workout.CreatedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
                                     </div>
                                 </div>
-                                <ChevronRight className="text-gray-500" size={20} />
+                            </div>
+                            {/* Action buttons */}
+                            <div className="flex gap-2 mt-4 pt-3 border-t border-gray-700">
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); navigate(`/create-workout?id=${workout.ID}`); }}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600/20 text-blue-400 rounded-lg hover:bg-blue-600/30 transition-colors text-sm font-medium"
+                                >
+                                    <Pencil size={14} />
+                                    Edit
+                                </button>
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); handleDelete(workout.ID, workout.Name); }}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-red-600/20 text-red-400 rounded-lg hover:bg-red-600/30 transition-colors text-sm font-medium"
+                                >
+                                    <Trash2 size={14} />
+                                    Delete
+                                </button>
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); navigate(`/session?workoutId=${workout.ID}`); }}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-green-600/20 text-green-400 rounded-lg hover:bg-green-600/30 transition-colors text-sm font-medium"
+                                >
+                                    <Play size={14} />
+                                    Start Session
+                                </button>
                             </div>
                         </div>
                     ))}
