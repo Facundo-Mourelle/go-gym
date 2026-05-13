@@ -96,6 +96,7 @@ func main() {
 	metricsService := service.NewMetricsService(
 		sessionRepo,
 		exerciseRepo,
+		equipmentRepo,
 		volumeCalc,
 		progressCalc,
 	)

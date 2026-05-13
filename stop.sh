@@ -4,11 +4,14 @@ echo "=== Shutting Down Go Gym ==="
 
 echo "[1/3] Stopping backend..."
 BACKEND_PID=$(lsof -ti :8080 2>/dev/null || true)
+KILLED=false
 if [ -n "$BACKEND_PID" ]; then
-  kill "$BACKEND_PID" 2>/dev/null || true
+  kill "$BACKEND_PID" 2>/dev/null && KILLED=true || true
+fi
+pkill -f "go run.*cmd/api/main.go" 2>/dev/null && KILLED=true || true
+pkill -f "/tmp/go-build.*/exe/main" 2>/dev/null && KILLED=true || true
+if [ "$KILLED" = true ]; then
   echo "Backend stopped"
-else
-  echo "Backend not running"
 fi
 
 echo "[2/3] Stopping frontend..."

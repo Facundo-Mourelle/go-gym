@@ -9,10 +9,11 @@ import (
 )
 
 type MetricsService struct {
-	sessionRepo  repository.SessionRepository
-	exerciseRepo repository.ExerciseRepository
-	volumeCalc   *calculator.VolumeCalculator
-	progressCalc *calculator.ProgressCalculator
+	sessionRepo    repository.SessionRepository
+	exerciseRepo   repository.ExerciseRepository
+	equipmentRepo  repository.EquipmentRepository
+	volumeCalc     *calculator.VolumeCalculator
+	progressCalc   *calculator.ProgressCalculator
 }
 
 type VolumeMetricsResponse struct {
@@ -28,14 +29,16 @@ type MuscleVolumeBreakdown struct {
 func NewMetricsService(
 	sessionRepo repository.SessionRepository,
 	exerciseRepo repository.ExerciseRepository,
+	equipmentRepo repository.EquipmentRepository,
 	volumeCalc *calculator.VolumeCalculator,
 	progressCalc *calculator.ProgressCalculator,
 ) *MetricsService {
 	return &MetricsService{
-		sessionRepo:  sessionRepo,
-		exerciseRepo: exerciseRepo,
-		volumeCalc:   volumeCalc,
-		progressCalc: progressCalc,
+		sessionRepo:   sessionRepo,
+		exerciseRepo:  exerciseRepo,
+		equipmentRepo: equipmentRepo,
+		volumeCalc:    volumeCalc,
+		progressCalc:  progressCalc,
 	}
 }
 
@@ -107,6 +110,16 @@ func (m *MetricsService) GetExerciseProgress(
 		return ExerciseProgressResponse{}, err
 	}
 
+	equipmentList, err := m.equipmentRepo.FindAll()
+	if err != nil {
+		return ExerciseProgressResponse{}, err
+	}
+
+	equipmentMap := make(map[domain.EquipmentID]domain.EquipmentType, len(equipmentList))
+	for _, eq := range equipmentList {
+		equipmentMap[eq.ID] = eq.Type
+	}
+
 	exerciseMap := make(map[domain.ExerciseID]domain.Exercise)
 	for _, ex := range exercises {
 		exerciseMap[ex.ID] = ex
@@ -130,20 +143,21 @@ func (m *MetricsService) GetExerciseProgress(
 
 	for _, setNumber := range availableSetNumbers {
 		setData := progressCalc.GetDataPointsBySetNumber(dataPoints, setNumber)
-		dataBySetNumber[setNumber] = toSetDataPointResponses(setData)
+		dataBySetNumber[setNumber] = toSetDataPointResponses(setData, equipmentMap)
 	}
 	return ExerciseProgressResponse{
 		ExerciseID:      exerciseID,
 		ExerciseName:    summary.ExerciseName,
-		AllDataPoints:   toSetDataPointResponses(dataPoints),
+		AllDataPoints:   toSetDataPointResponses(dataPoints, equipmentMap),
 		DataBySetNumber: dataBySetNumber,
 		Summary:         toProgressSummaryResponse(summary),
 	}, nil
 }
 
-func toSetDataPointResponses(dataPoints []calculator.SetDataPoint) []SetDataPointResponse {
+func toSetDataPointResponses(dataPoints []calculator.SetDataPoint, equipmentMap map[domain.EquipmentID]domain.EquipmentType) []SetDataPointResponse {
 	responses := make([]SetDataPointResponse, len(dataPoints))
 	for i, dp := range dataPoints {
+		eqType := equipmentMap[dp.EquipmentID]
 		responses[i] = SetDataPointResponse{
 			Date:          dp.Date,
 			SessionID:     string(dp.SessionID),
@@ -154,7 +168,7 @@ func toSetDataPointResponses(dataPoints []calculator.SetDataPoint) []SetDataPoin
 			EffectiveLoad: dp.EffectiveLoad,
 			RawLoad:       dp.RawLoad,
 			RepsInReserve: dp.RepsInReserve,
-			EquipmentID:   string(dp.EquipmentID),
+			EquipmentType: string(eqType),
 		}
 	}
 	return responses
@@ -215,7 +229,7 @@ type SetDataPointResponse struct {
 	EffectiveLoad float64   `json:"effective_load"`
 	RawLoad       float64   `json:"weight"`
 	RepsInReserve int       `json:"rir"`
-	EquipmentID   string    `json:"equipment_type"`
+	EquipmentType string    `json:"equipment_type"`
 }
 
 type ProgressSummaryResponse struct {
