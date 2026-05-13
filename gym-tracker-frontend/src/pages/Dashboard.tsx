@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-import { Play, PlusCircle, Clock, List, Dumbbell, Settings } from 'lucide-react';
+import { Play, PlusCircle, Clock, List, Dumbbell, LogOut } from 'lucide-react';
 
 export const Dashboard: React.FC = () => {
     const navigate = useNavigate();
@@ -21,7 +21,7 @@ export const Dashboard: React.FC = () => {
                     onClick={handleLogout}
                     className="p-2 text-night-muted hover:text-night-red transition-colors"
                 >
-                    <Settings size={20} />
+                    <LogOut size={20} />
                 </button>
             </div>
 
