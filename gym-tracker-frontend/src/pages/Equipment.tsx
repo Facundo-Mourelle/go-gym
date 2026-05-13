@@ -73,17 +73,26 @@ export const Equipment: React.FC = () => {
                                 {eq.pulley_type}
                             </span>
                         )}
-                        {eq.stack_weights && eq.stack_weights.length > 0 && (
+                        {eq.weight_increment && (
                             <span className="bg-gray-700 text-gray-300 text-xs px-2 py-1 rounded-md border border-gray-600">
-                                {eq.stack_weights.length} weights
+                                +{eq.weight_increment} kg/step
                             </span>
                         )}
                     </>
                 )}
-                {eq.type === 'machine' && eq.resistance_profile_name && (
-                    <span className="bg-gray-700 text-gray-300 text-xs px-2 py-1 rounded-md border border-gray-600">
-                        {eq.resistance_profile_name}
-                    </span>
+                {eq.type === 'machine' && (
+                    <>
+                        {eq.resistance_profile_name && (
+                            <span className="bg-gray-700 text-gray-300 text-xs px-2 py-1 rounded-md border border-gray-600">
+                                {eq.resistance_profile_name}
+                            </span>
+                        )}
+                        {eq.movement_pattern && (
+                            <span className="bg-blue-900/50 text-blue-300 text-xs px-2 py-1 rounded-md border border-blue-800/50">
+                                {eq.movement_pattern.replace(/_/g, ' ')}
+                            </span>
+                        )}
+                    </>
                 )}
             </div>
         </div>

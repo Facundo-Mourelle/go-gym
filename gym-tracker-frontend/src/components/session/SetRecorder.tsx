@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { RecordSetRequest } from '../../types/session';
 import type { EquipmentType } from '../../types/exercise';
-import { equipmentApi, type EquipmentItem } from '../../api/equipment';
+import { equipmentApi, type EquipmentData } from '../../api/equipment';
 
 interface SetRecorderProps {
     exerciseId: string;
@@ -14,6 +14,7 @@ interface SetRecorderProps {
     lastSessionReps?: number;
     lastSessionWeight?: number;
     equipmentTypes?: EquipmentType[];
+    exercisePrimaryPatterns?: string[];
 }
 
 export const SetRecorder: React.FC<SetRecorderProps> = ({
@@ -27,28 +28,49 @@ export const SetRecorder: React.FC<SetRecorderProps> = ({
     lastSessionReps,
     lastSessionWeight,
     equipmentTypes,
+    exercisePrimaryPatterns,
 }) => {
-    const [allEquipment, setAllEquipment] = useState<EquipmentItem[]>([]);
+    const [allEquipment, setAllEquipment] = useState<EquipmentData[]>([]);
     const [equipmentId, setEquipmentId] = useState<string>('');
     const [reps, setReps] = useState<number | ''>(initialReps ?? '');
     const [weight, setWeight] = useState<number>(initialWeight ?? lastSessionWeight ?? 0);
     const [rir, setRir] = useState<number>(2);
 
+    const isCompatible = (eq: EquipmentData) => {
+        // Cables and freeweights are always shown
+        if (eq.type === 'cable' || eq.type === 'freeweight') return true;
+
+        // For machines: check both equipment type compatibility AND movement pattern
+        const typeOk = !equipmentTypes || equipmentTypes.length === 0 ||
+            equipmentTypes.some(exerciseType => {
+                const typeMapping: Record<string, string> = {
+                    'barbell': 'freeweight',
+                    'dumbbell': 'freeweight',
+                    'machine': 'machine',
+                };
+                return typeMapping[exerciseType] === eq.type;
+            });
+
+        if (!typeOk) return false;
+
+        // If no primary patterns set, show machine
+        if (!exercisePrimaryPatterns || exercisePrimaryPatterns.length === 0) return true;
+
+        // Machine must have a movement_pattern that matches one of the exercise's patterns
+        return eq.movement_pattern ? exercisePrimaryPatterns.includes(eq.movement_pattern) : false;
+    };
+
     useEffect(() => {
         equipmentApi.list().then((items) => {
             setAllEquipment(items);
-            const compatible = items.filter(
-                (eq) => !equipmentTypes || equipmentTypes.length === 0 || equipmentTypes.includes(eq.type as EquipmentType)
-            );
+            const compatible = items.filter((eq) => isCompatible(eq));
             if (compatible.length > 0 && !equipmentId) {
                 setEquipmentId(compatible[0].id);
             }
         });
     }, []);
 
-    const availableEquipment = allEquipment.filter(
-        (eq) => !equipmentTypes || equipmentTypes.length === 0 || equipmentTypes.includes(eq.type as EquipmentType)
-    );
+    const availableEquipment = allEquipment.filter((eq) => isCompatible(eq));
 
     const canSubmit = reps !== '' && reps > 0 && equipmentId !== '' && !isLoading;
 
@@ -114,7 +136,7 @@ export const SetRecorder: React.FC<SetRecorderProps> = ({
                                 step="0.5"
                                 value={weight}
                                 placeholder={lastSessionWeight ? `Last: ${lastSessionWeight}` : ''}
-                                onChange={(e) => setWeight(parseFloat(e.target.value))}
+                                onChange={(e) => setWeight(e.target.value === '' ? 0 : parseFloat(e.target.value))}
                                 className="w-full bg-transparent text-center text-white text-xl font-bold focus:outline-none appearance-none placeholder:text-gray-500"
                                 disabled={isLoading}
                             />

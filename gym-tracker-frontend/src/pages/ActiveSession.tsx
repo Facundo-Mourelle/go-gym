@@ -252,6 +252,7 @@ export const ActiveSession: React.FC = () => {
                             onRecordSet={handleRecordSet}
                             isLoading={isRecording}
                             equipmentTypes={selectedExercise.equipment}
+                            exercisePrimaryPatterns={selectedExercise.primary_patterns?.map(p => p.pattern)}
                             lastSessionReps={lastSessionMap.get(selectedExercise.id)?.reps}
                             lastSessionWeight={lastSessionMap.get(selectedExercise.id)?.weight}
                         />

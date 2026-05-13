@@ -19,14 +19,34 @@ const PULLEY_OPTIONS = [
     { value: '4:1', label: '4:1' },
 ];
 
+const MOVEMENT_PATTERN_OPTIONS = [
+    { value: 'horizontal_push', label: 'Horizontal Push (Chest Press)' },
+    { value: 'horizontal_pull', label: 'Horizontal Pull (Rows)' },
+    { value: 'vertical_push', label: 'Vertical Push (Overhead Press)' },
+    { value: 'vertical_pull', label: 'Vertical Pull (Lat Pulldown)' },
+    { value: 'shoulder_flexion', label: 'Shoulder Flexion' },
+    { value: 'shoulder_extension', label: 'Shoulder Extension' },
+    { value: 'shoulder_abduction', label: 'Shoulder Abduction (Lateral Raise)' },
+    { value: 'shoulder_adduction', label: 'Shoulder Adduction' },
+    { value: 'hip_hinge', label: 'Hip Hinge (Deadlift)' },
+    { value: 'hip_adduction', label: 'Hip Adduction' },
+    { value: 'squat_pattern', label: 'Squat Pattern' },
+    { value: 'knee_extension', label: 'Knee Extension' },
+    { value: 'elbow_flexion', label: 'Elbow Flexion (Curls)' },
+    { value: 'elbow_extension', label: 'Elbow Extension (Triceps)' },
+    { value: 'spinal_flexion', label: 'Spinal Flexion' },
+    { value: 'spinal_extension', label: 'Spinal Extension' },
+];
+
 export const CreateEquipmentModal: React.FC<Props> = ({ onClose, onCreated }) => {
     const [name, setName] = useState('');
     const [type, setType] = useState<'freeweight' | 'cable' | 'machine'>('freeweight');
     const [manufacturer, setManufacturer] = useState('');
     const [actualWeight, setActualWeight] = useState('');
     const [pulleyType, setPulleyType] = useState('');
-    const [stackWeights, setStackWeights] = useState('');
+    const [weightIncrement, setWeightIncrement] = useState('');
     const [resistanceProfileName, setResistanceProfileName] = useState('');
+    const [movementPattern, setMovementPattern] = useState('');
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
 
@@ -53,16 +73,12 @@ export const CreateEquipmentModal: React.FC<Props> = ({ onClose, onCreated }) =>
 
             if (type === 'cable') {
                 if (pulleyType) data.pulley_type = pulleyType;
-                if (stackWeights.trim()) {
-                    data.stack_weights = stackWeights
-                        .split(',')
-                        .map(s => parseFloat(s.trim()))
-                        .filter(n => !isNaN(n));
-                }
+                if (weightIncrement) data.weight_increment = parseFloat(weightIncrement);
             }
 
-            if (type === 'machine' && resistanceProfileName.trim()) {
-                data.resistance_profile_name = resistanceProfileName.trim();
+            if (type === 'machine') {
+                if (resistanceProfileName.trim()) data.resistance_profile_name = resistanceProfileName.trim();
+                if (movementPattern) data.movement_pattern = movementPattern;
             }
 
             await equipmentApi.create(data);
@@ -168,30 +184,49 @@ export const CreateEquipmentModal: React.FC<Props> = ({ onClose, onCreated }) =>
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Stack Weights (comma-separated)</label>
-                                <textarea
-                                    value={stackWeights}
-                                    onChange={e => setStackWeights(e.target.value)}
-                                    rows={2}
-                                    className="w-full bg-gray-700 border border-gray-600 text-white rounded-xl p-3 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none"
-                                    placeholder="e.g. 5, 10, 15, 20, 25"
-                                />
-                                <p className="text-xs text-gray-500 mt-1">Enter weights separated by commas</p>
+                                <label className="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Weight Increase</label>
+                                <select
+                                    value={weightIncrement}
+                                    onChange={e => setWeightIncrement(e.target.value)}
+                                    className="w-full bg-gray-700 border border-gray-600 text-white rounded-xl p-3 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                >
+                                    <option value="">Select weight increase...</option>
+                                    <option value="1.25">1.25 kg</option>
+                                    <option value="2.5">2.5 kg</option>
+                                    <option value="4.5">4.5 kg (10 lb)</option>
+                                </select>
+                                <p className="text-xs text-gray-500 mt-1">The smallest increment between plates in the stack</p>
                             </div>
                         </>
                     )}
 
                     {type === 'machine' && (
-                        <div>
-                            <label className="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Resistance Profile Name</label>
-                            <input
-                                type="text"
-                                value={resistanceProfileName}
-                                onChange={e => setResistanceProfileName(e.target.value)}
-                                className="w-full bg-gray-700 border border-gray-600 text-white rounded-xl p-3 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                                placeholder="e.g. Cybex VR2"
-                            />
-                        </div>
+                        <>
+                            <div>
+                                <label className="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Resistance Profile Name</label>
+                                <input
+                                    type="text"
+                                    value={resistanceProfileName}
+                                    onChange={e => setResistanceProfileName(e.target.value)}
+                                    className="w-full bg-gray-700 border border-gray-600 text-white rounded-xl p-3 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                    placeholder="e.g. Cybex VR2"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Movement Pattern</label>
+                                <select
+                                    value={movementPattern}
+                                    onChange={e => setMovementPattern(e.target.value)}
+                                    className="w-full bg-gray-700 border border-gray-600 text-white rounded-xl p-3 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                >
+                                    <option value="">Select movement pattern...</option>
+                                    {MOVEMENT_PATTERN_OPTIONS.map(opt => (
+                                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                    ))}
+                                </select>
+                                <p className="text-xs text-gray-500 mt-1">Which movement pattern this machine is designed for</p>
+                            </div>
+                        </>
                     )}
 
                     <button

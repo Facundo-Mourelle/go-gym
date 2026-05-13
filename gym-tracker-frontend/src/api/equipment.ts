@@ -9,8 +9,10 @@ export interface EquipmentData {
     actual_weight?: number;
     pulley_type?: string;
     stack_weights?: number[];
+    weight_increment?: number;
     resistance_profile_id?: string;
     resistance_profile_name?: string;
+    movement_pattern?: string;
 }
 
 export interface CreateEquipmentData {
@@ -20,8 +22,10 @@ export interface CreateEquipmentData {
     actual_weight?: number;
     pulley_type?: string;
     stack_weights?: number[];
+    weight_increment?: number;
     resistance_profile_id?: string;
     resistance_profile_name?: string;
+    movement_pattern?: string;
 }
 
 export const equipmentApi = {

@@ -25,8 +25,10 @@ type EquipmentResponse struct {
 	ActualWeight          float64              `json:"actual_weight,omitempty"`
 	PulleyType            string               `json:"pulley_type,omitempty"`
 	StackWeights         []float64            `json:"stack_weights,omitempty"`
+	WeightIncrement       float64              `json:"weight_increment,omitempty"`
 	ResistanceProfileID  string               `json:"resistance_profile_id,omitempty"`
 	ResistanceProfileName string              `json:"resistance_profile_name,omitempty"`
+	MovementPattern       string               `json:"movement_pattern,omitempty"`
 }
 
 func toEquipmentResponse(eq domain.Equipment) EquipmentResponse {
@@ -39,8 +41,10 @@ func toEquipmentResponse(eq domain.Equipment) EquipmentResponse {
 		ActualWeight:          eq.ActualWeight,
 		PulleyType:            eq.PulleyType,
 		StackWeights:          eq.StackWeights,
+		WeightIncrement:       eq.WeightIncrement,
 		ResistanceProfileID:  eq.ResistanceProfileID,
 		ResistanceProfileName: eq.ResistanceProfileName,
+		MovementPattern:       string(eq.MovementPattern),
 	}
 }
 
@@ -62,8 +66,10 @@ func (h *EquipmentHandler) ListEquipment(w http.ResponseWriter, r *http.Request)
 			ActualWeight:          eq.ActualWeight,
 			PulleyType:            eq.PulleyType,
 			StackWeights:          eq.StackWeights,
+			WeightIncrement:       eq.WeightIncrement,
 			ResistanceProfileID:  eq.ResistanceProfileID,
 			ResistanceProfileName: eq.ResistanceProfileName,
+			MovementPattern:       string(eq.MovementPattern),
 		}
 	}
 
@@ -84,8 +90,10 @@ func (h *EquipmentHandler) CreateEquipment(w http.ResponseWriter, r *http.Reques
 		ActualWeight          float64              `json:"actual_weight"`
 		PulleyType            string               `json:"pulley_type"`
 		StackWeights         []float64            `json:"stack_weights"`
+		WeightIncrement       float64              `json:"weight_increment"`
 		ResistanceProfileID  string               `json:"resistance_profile_id"`
 		ResistanceProfileName string              `json:"resistance_profile_name"`
+		MovementPattern       string               `json:"movement_pattern"`
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -111,8 +119,10 @@ func (h *EquipmentHandler) CreateEquipment(w http.ResponseWriter, r *http.Reques
 		ActualWeight:          req.ActualWeight,
 		PulleyType:            req.PulleyType,
 		StackWeights:         req.StackWeights,
+		WeightIncrement:       req.WeightIncrement,
 		ResistanceProfileID:  req.ResistanceProfileID,
 		ResistanceProfileName: req.ResistanceProfileName,
+		MovementPattern:       domain.MovementPattern(req.MovementPattern),
 	}
 
 	created, err := h.equipmentService.Create(equipment)
@@ -141,8 +151,10 @@ func (h *EquipmentHandler) UpdateEquipment(w http.ResponseWriter, r *http.Reques
 		ActualWeight          float64              `json:"actual_weight"`
 		PulleyType            string               `json:"pulley_type"`
 		StackWeights         []float64            `json:"stack_weights"`
+		WeightIncrement       float64              `json:"weight_increment"`
 		ResistanceProfileID  string               `json:"resistance_profile_id"`
 		ResistanceProfileName string              `json:"resistance_profile_name"`
+		MovementPattern       string               `json:"movement_pattern"`
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -159,8 +171,10 @@ func (h *EquipmentHandler) UpdateEquipment(w http.ResponseWriter, r *http.Reques
 		ActualWeight:          req.ActualWeight,
 		PulleyType:            req.PulleyType,
 		StackWeights:         req.StackWeights,
+		WeightIncrement:       req.WeightIncrement,
 		ResistanceProfileID:  req.ResistanceProfileID,
 		ResistanceProfileName: req.ResistanceProfileName,
+		MovementPattern:       domain.MovementPattern(req.MovementPattern),
 	}
 
 	if err := h.equipmentService.Update(equipment); err != nil {

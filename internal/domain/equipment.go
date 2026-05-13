@@ -19,10 +19,12 @@ type Equipment struct {
 	ActualWeight        float64
 
 	// Cable-specific fields
-	StackWeights []float64
-	PulleyType   string
+	StackWeights      []float64
+	PulleyType        string
+	WeightIncrement   float64 // weight increment for cable stack (1.25, 2.5, 4.5)
 
 	// Machine-specific
 	ResistanceProfileID   string
 	ResistanceProfileName string
+	MovementPattern       MovementPattern // which movement pattern this machine is for
 }

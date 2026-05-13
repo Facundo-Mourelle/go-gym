@@ -89,7 +89,11 @@ func (s *SessionService) RecordSet(
 		return RecordSetResponse{}, fmt.Errorf("equipment not found: %w", err)
 	}
 
-	profile, err := s.profileRegistry.Get(equipment.ResistanceProfileID)
+	profileID := equipment.ResistanceProfileID
+	if profileID == "" {
+		profileID = "free_weight"
+	}
+	profile, err := s.profileRegistry.Get(profileID)
 	if err != nil {
 		return RecordSetResponse{}, fmt.Errorf("resistance profile not found: %w", err)
 	}
@@ -174,7 +178,11 @@ func (s *SessionService) UpdateSet(
 			return RecordSetResponse{}, fmt.Errorf("equipment not found: %w", err)
 		}
 
-		profile, err := s.profileRegistry.Get(equipment.ResistanceProfileID)
+		profileID := equipment.ResistanceProfileID
+		if profileID == "" {
+			profileID = "free_weight"
+		}
+		profile, err := s.profileRegistry.Get(profileID)
 		if err != nil {
 			return RecordSetResponse{}, fmt.Errorf("resistance profile not found: %w", err)
 		}

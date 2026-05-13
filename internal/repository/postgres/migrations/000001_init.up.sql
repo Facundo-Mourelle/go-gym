@@ -72,8 +72,10 @@ CREATE TABLE equipment (
     actual_weight DOUBLE PRECISION DEFAULT 0,
     cable_pulley_type VARCHAR(100) DEFAULT '',
     cable_stack_weights DOUBLE PRECISION[] DEFAULT '{}',
+    cable_weight_increment DOUBLE PRECISION DEFAULT 0,
     resistance_profile_id VARCHAR(255),
-    resistance_profile_name VARCHAR(255) DEFAULT ''
+    resistance_profile_name VARCHAR(255) DEFAULT '',
+    movement_pattern VARCHAR(100) DEFAULT ''
 );
 
 -- Add new columns to existing equipment table
@@ -83,6 +85,8 @@ ALTER TABLE equipment ADD COLUMN IF NOT EXISTS actual_weight DOUBLE PRECISION DE
 ALTER TABLE equipment ADD COLUMN IF NOT EXISTS cable_pulley_type VARCHAR(100) DEFAULT '';
 ALTER TABLE equipment ADD COLUMN IF NOT EXISTS cable_stack_weights DOUBLE PRECISION[] DEFAULT '{}';
 ALTER TABLE equipment ADD COLUMN IF NOT EXISTS resistance_profile_name VARCHAR(255) DEFAULT '';
+ALTER TABLE equipment ADD COLUMN IF NOT EXISTS cable_weight_increment DOUBLE PRECISION DEFAULT 0;
+ALTER TABLE equipment ADD COLUMN IF NOT EXISTS movement_pattern VARCHAR(100) DEFAULT '';
 
 CREATE TABLE routines (
     id VARCHAR(255) PRIMARY KEY,
