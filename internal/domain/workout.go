@@ -1,5 +1,7 @@
 package domain
 
+import "time"
+
 type WorkoutPlanID string
 type WorkoutExerciseID string
 
@@ -8,6 +10,8 @@ type WorkoutPlan struct {
 	UserID      string
 	Name        string
 	Description string
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 	Exercises   []WorkoutExercise
 }
 

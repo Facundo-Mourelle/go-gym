@@ -42,8 +42,9 @@ func (s *WorkoutService) CreateWorkout(
 			Order:      exReq.Order,
 			ExerciseID: exReq.ExerciseID,
 			Sets:       exReq.Sets,
-
-			Notes: exReq.Notes,
+			Reps:       exReq.Reps,
+			RepsInReserve: exReq.RepsInReserve,
+			Notes:      exReq.Notes,
 		}
 	}
 
@@ -88,11 +89,18 @@ func (s *WorkoutService) ListWorkouts(userID string) ([]WorkoutSummaryResponse, 
 
 	responses := make([]WorkoutSummaryResponse, len(workouts))
 	for i, workout := range workouts {
+		totalSets := 0
+		for _, ex := range workout.Exercises {
+			totalSets += ex.Sets
+		}
 		responses[i] = WorkoutSummaryResponse{
 			ID:            workout.ID,
 			Name:          workout.Name,
 			Description:   workout.Description,
 			ExerciseCount: len(workout.Exercises),
+			TotalSets:     totalSets,
+			CreatedAt:     workout.CreatedAt,
+			UpdatedAt:     workout.UpdatedAt,
 		}
 	}
 
@@ -207,10 +215,17 @@ func (s *WorkoutService) toWorkoutResponse(workout domain.WorkoutPlan) (WorkoutR
 	for i, we := range workout.Exercises {
 		exercise := exerciseMap[we.ExerciseID]
 
+		// Get equipment type from SuggestedEquipment, fallback to empty string
+		equipmentType := domain.EquipmentType("")
+		if len(exercise.SuggestedEquipment) > 0 {
+			equipmentType = exercise.SuggestedEquipment[0]
+		}
 		exerciseResponses[i] = WorkoutExerciseResponse{
 			ID:            we.ID,
 			Order:         we.Order,
 			ExerciseID:    exercise.ID,
+			ExerciseName:  exercise.Name,
+			EquipmentType: equipmentType,
 			Sets:          we.Sets,
 			Reps:          we.Reps,
 			RepsInReserve: we.RepsInReserve,
@@ -222,6 +237,8 @@ func (s *WorkoutService) toWorkoutResponse(workout domain.WorkoutPlan) (WorkoutR
 		ID:          workout.ID,
 		Name:        workout.Name,
 		Description: workout.Description,
+		CreatedAt:   workout.CreatedAt,
+		UpdatedAt:   workout.UpdatedAt,
 		Exercises:   exerciseResponses,
 	}, nil
 }
@@ -253,6 +270,8 @@ type WorkoutResponse struct {
 	ID          domain.WorkoutPlanID
 	Name        string
 	Description string
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 	Exercises   []WorkoutExerciseResponse
 }
 
@@ -264,6 +283,8 @@ type WorkoutExerciseResponse struct {
 	Reps          int
 	RepsInReserve int
 	Notes         string
+	ExerciseName  string             // name of the exercise
+	EquipmentType domain.EquipmentType  // broad equipment category
 }
 
 type WorkoutSummaryResponse struct {
@@ -271,6 +292,7 @@ type WorkoutSummaryResponse struct {
 	Name          string
 	Description   string
 	ExerciseCount int
+	TotalSets     int  // sum of sets across all exercises
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
 }

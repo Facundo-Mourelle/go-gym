@@ -41,8 +41,8 @@ func (r *WorkoutPostgresRepository) Create(workout domain.WorkoutPlan) error {
 	for _, exercise := range workout.Exercises {
 		exQuery := `
         INSERT INTO workout_exercises 
-        (id, workout_plan_id, exercise_id, order_num, sets, reps, reps_in_reserve, notes)
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        (id, workout_plan_id, exercise_id, "order", sets, reps, reps_in_reserve, notes)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
     `
 
 		_, err = tx.Exec(
@@ -67,9 +67,9 @@ func (r *WorkoutPostgresRepository) Create(workout domain.WorkoutPlan) error {
 
 func (r *WorkoutPostgresRepository) FindByID(id domain.WorkoutPlanID) (domain.WorkoutPlan, error) {
 	query :=
-		`SELECT id, user_id, name, description 
-    FROM workout_plans 
-    WHERE id = $1`
+		`SELECT id, user_id, name, description, created_at, updated_at
+     FROM workout_plans 
+     WHERE id = $1`
 	var workout domain.WorkoutPlan
 
 	err := r.db.QueryRow(query, id).Scan(
@@ -77,6 +77,8 @@ func (r *WorkoutPostgresRepository) FindByID(id domain.WorkoutPlanID) (domain.Wo
 		&workout.UserID,
 		&workout.Name,
 		&workout.Description,
+		&workout.CreatedAt,
+		&workout.UpdatedAt,
 	)
 
 	if err == sql.ErrNoRows {
@@ -96,10 +98,10 @@ func (r *WorkoutPostgresRepository) FindByID(id domain.WorkoutPlanID) (domain.Wo
 
 func (r *WorkoutPostgresRepository) loadExercises(workout *domain.WorkoutPlan) error {
 	query :=
-		`SELECT exercises
-        FROM workout_exercises 
-        WHERE workout_plan_id = $1 
-        ORDER BY order_num`
+		`SELECT id, exercise_id, "order", sets, reps, reps_in_reserve, notes
+         FROM workout_exercises 
+         WHERE workout_plan_id = $1 
+         ORDER BY "order"`
 	rows, err := r.db.Query(query, workout.ID)
 	if err != nil {
 		return err
@@ -113,8 +115,9 @@ func (r *WorkoutPostgresRepository) loadExercises(workout *domain.WorkoutPlan) e
 
 		err := rows.Scan(
 			&exercise.ID,
-			&exercise.Order,
 			&exercise.ExerciseID,
+			&exercise.Order,
+			&exercise.Sets,
 			&exercise.Reps,
 			&exercise.RepsInReserve,
 			&exercise.Notes,
@@ -132,10 +135,10 @@ func (r *WorkoutPostgresRepository) loadExercises(workout *domain.WorkoutPlan) e
 
 func (r *WorkoutPostgresRepository) FindByUser(userID string) ([]domain.WorkoutPlan, error) {
 	query :=
-		`SELECT id, order_num, exercise_id, exercises, notes
-        FROM workout_plans 
-        WHERE user_id = $1 
-        ORDER BY created_at DESC`
+		`SELECT id, user_id, name, description, created_at, updated_at
+         FROM workout_plans 
+         WHERE user_id = $1 
+         ORDER BY created_at DESC`
 	rows, err := r.db.Query(query, userID)
 	if err != nil {
 		return nil, err
@@ -149,9 +152,11 @@ func (r *WorkoutPostgresRepository) FindByUser(userID string) ([]domain.WorkoutP
 
 		err := rows.Scan(
 			&workout.ID,
+			&workout.UserID,
 			&workout.Name,
-			&workout.Exercises,
 			&workout.Description,
+			&workout.CreatedAt,
+			&workout.UpdatedAt,
 		)
 
 		if err != nil {
@@ -208,8 +213,8 @@ func (r *WorkoutPostgresRepository) Update(workout domain.WorkoutPlan) error {
 	for _, exercise := range workout.Exercises {
 		exQuery := `
         INSERT INTO workout_exercises 
-        (id, workout_plan_id, exercise_id, order_num, sets, reps, reps_in_reserve, notes) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7)`
+        (id, workout_plan_id, exercise_id, "order", sets, reps, reps_in_reserve, notes) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 
 		_, err = tx.Exec(
 			exQuery,
@@ -232,6 +237,11 @@ func (r *WorkoutPostgresRepository) Update(workout domain.WorkoutPlan) error {
 }
 
 func (r *WorkoutPostgresRepository) Delete(id domain.WorkoutPlanID) error {
+	_, err := r.db.Exec("DELETE FROM workout_exercises WHERE workout_plan_id = $1", id)
+	if err != nil {
+		return err
+	}
+	
 	query := `DELETE FROM workout_plans WHERE id = $1`
 	result, err := r.db.Exec(query, id)
 	if err != nil {

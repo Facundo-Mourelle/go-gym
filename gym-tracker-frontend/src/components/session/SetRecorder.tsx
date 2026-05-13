@@ -32,6 +32,7 @@ export const SetRecorder: React.FC<SetRecorderProps> = ({
 }) => {
     const [allEquipment, setAllEquipment] = useState<EquipmentData[]>([]);
     const [equipmentId, setEquipmentId] = useState<string>('');
+    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const [reps, setReps] = useState<number | ''>(initialReps ?? '');
     const [weight, setWeight] = useState<number>(initialWeight ?? lastSessionWeight ?? 0);
     const [rir, setRir] = useState<number>(2);
@@ -65,12 +66,23 @@ export const SetRecorder: React.FC<SetRecorderProps> = ({
             setAllEquipment(items);
             const compatible = items.filter((eq) => isCompatible(eq));
             if (compatible.length > 0 && !equipmentId) {
+                const uniqueCategories = Array.from(new Set(compatible.map(eq => eq.type)));
+                setSelectedCategory(uniqueCategories[0]);
                 setEquipmentId(compatible[0].id);
             }
         });
     }, []);
 
     const availableEquipment = allEquipment.filter((eq) => isCompatible(eq));
+
+    const categories = React.useMemo(() => {
+        const cats = new Set(availableEquipment.map(eq => eq.type));
+        return Array.from(cats);
+    }, [availableEquipment]);
+
+    const categoryEquipment = selectedCategory
+        ? availableEquipment.filter(eq => eq.type === selectedCategory)
+        : [];
 
     const canSubmit = reps !== '' && reps > 0 && equipmentId !== '' && !isLoading;
 
@@ -105,23 +117,63 @@ export const SetRecorder: React.FC<SetRecorderProps> = ({
                     <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
                         Equipment
                     </label>
-                    <div className="flex flex-wrap gap-2">
-                        {availableEquipment.map((eq) => (
-                            <button
-                                key={eq.id}
-                                type="button"
-                                onClick={() => setEquipmentId(eq.id)}
-                                disabled={isLoading}
-                                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                                    equipmentId === eq.id
-                                        ? 'bg-blue-600 text-white'
-                                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
-                                }`}
-                            >
-                                {eq.name}
-                            </button>
-                        ))}
+                    {/* Level 1: Category pills */}
+                    <div className="flex flex-wrap gap-2 mb-3">
+                        {categories.map((cat) => {
+                            const count = availableEquipment.filter(eq => eq.type === cat).length;
+                            const isSelected = selectedCategory === cat;
+                            const categoryLabel = cat === 'freeweight' ? 'Free Weight' : cat === 'cable' ? 'Cable' : 'Machine';
+                            
+                            const categoryColors: Record<string, { active: string; inactive: string }> = {
+                                freeweight: { active: 'bg-orange-500 text-white', inactive: 'bg-orange-900/40 text-orange-300 hover:bg-orange-900/60' },
+                                cable: { active: 'bg-purple-500 text-white', inactive: 'bg-purple-900/40 text-purple-300 hover:bg-purple-900/60' },
+                                machine: { active: 'bg-blue-500 text-white', inactive: 'bg-blue-900/40 text-blue-300 hover:bg-blue-900/60' },
+                            };
+                            const colors = categoryColors[cat] || categoryColors.machine;
+                            
+                            return (
+                                <button
+                                    key={cat}
+                                    type="button"
+                                    onClick={() => {
+                                        setSelectedCategory(cat);
+                                        const firstInCategory = availableEquipment.find(eq => eq.type === cat);
+                                        if (firstInCategory) {
+                                            setEquipmentId(firstInCategory.id);
+                                        }
+                                    }}
+                                    disabled={isLoading}
+                                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isSelected ? colors.active : colors.inactive}`}
+                                >
+                                    {categoryLabel}{!isSelected && ` (${count})`}
+                                </button>
+                            );
+                        })}
                     </div>
+                    {/* Level 2: Equipment item pills */}
+                    {selectedCategory && (
+                        <div className="flex flex-wrap gap-2">
+                            {categoryEquipment.length > 0 ? (
+                                categoryEquipment.map((eq) => (
+                                    <button
+                                        key={eq.id}
+                                        type="button"
+                                        onClick={() => setEquipmentId(eq.id)}
+                                        disabled={isLoading}
+                                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                                            equipmentId === eq.id
+                                                ? 'bg-blue-600 text-white'
+                                                : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
+                                        }`}
+                                    >
+                                        {eq.name}
+                                    </button>
+                                ))
+                            ) : (
+                                <span className="text-gray-500 text-sm">No equipment available</span>
+                            )}
+                        </div>
+                    )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">

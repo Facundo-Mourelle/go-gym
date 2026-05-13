@@ -47,6 +47,9 @@ func NewRouter(
 	workoutHandler := handler.NewWorkoutHandler(workoutService)
 	mux.HandleFunc("POST /api/v1/workouts", Protected(authService, workoutHandler.CreateWorkout))
 	mux.HandleFunc("GET /api/v1/workouts", Protected(authService, workoutHandler.ListWorkouts))
+	mux.HandleFunc("GET /api/v1/workouts/{id}", Protected(authService, workoutHandler.GetWorkout))
+	mux.HandleFunc("PUT /api/v1/workouts/{id}", Protected(authService, workoutHandler.UpdateWorkout))
+	mux.HandleFunc("DELETE /api/v1/workouts/{id}", Protected(authService, workoutHandler.DeleteWorkout))
 
 	// Session endpoints
 	sessionHandler := handler.NewSessionHandler(sessionService)

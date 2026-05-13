@@ -2,6 +2,7 @@ package memory
 
 import (
 	"sync"
+	"time"
 
 	"github.com/Facundo-Mourelle/go-gym/internal/domain"
 	"github.com/Facundo-Mourelle/go-gym/internal/repository"
@@ -26,6 +27,9 @@ func (r *WorkoutMemoryRepository) Create(workout domain.WorkoutPlan) error {
 		return repository.ErrAlreadyExists
 	}
 
+	now := time.Now()
+	workout.CreatedAt = now
+	workout.UpdatedAt = now
 	r.workouts[workout.ID] = workout
 	return nil
 }
@@ -64,6 +68,7 @@ func (r *WorkoutMemoryRepository) Update(workout domain.WorkoutPlan) error {
 		return repository.ErrNotFound
 	}
 
+	workout.UpdatedAt = time.Now()
 	r.workouts[workout.ID] = workout
 	return nil
 }
