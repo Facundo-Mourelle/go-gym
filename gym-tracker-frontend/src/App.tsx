@@ -10,6 +10,7 @@ import { Metrics } from './pages/Metrics';
 import { Layout } from './components/Layout';
 import { Exercises } from './pages/Exercises';
 import { CreateWorkout } from './pages/CreateWorkout';
+import { Equipment } from './pages/Equipment';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated } = useAuthStore();
@@ -77,6 +78,7 @@ function App() {
           <Route path="/history" element={<Workouts />} />
           <Route path="/progress" element={<Metrics />} />
           <Route path="/exercises" element={<Exercises />} />
+          <Route path="/equipment" element={<Equipment />} />
           <Route path="/create-workout" element={<CreateWorkout />} />
         </Route>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />

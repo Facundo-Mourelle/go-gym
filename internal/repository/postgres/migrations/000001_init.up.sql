@@ -67,8 +67,22 @@ CREATE TABLE equipment (
     id VARCHAR(255) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     type VARCHAR(100) NOT NULL,
-    resistance_profile_id VARCHAR(255)
+    manufacturer VARCHAR(255) DEFAULT '',
+    user_id VARCHAR(255) REFERENCES users(id),
+    actual_weight DOUBLE PRECISION DEFAULT 0,
+    cable_pulley_type VARCHAR(100) DEFAULT '',
+    cable_stack_weights DOUBLE PRECISION[] DEFAULT '{}',
+    resistance_profile_id VARCHAR(255),
+    resistance_profile_name VARCHAR(255) DEFAULT ''
 );
+
+-- Add new columns to existing equipment table
+ALTER TABLE equipment ADD COLUMN IF NOT EXISTS manufacturer VARCHAR(255) DEFAULT '';
+ALTER TABLE equipment ADD COLUMN IF NOT EXISTS user_id VARCHAR(255) REFERENCES users(id);
+ALTER TABLE equipment ADD COLUMN IF NOT EXISTS actual_weight DOUBLE PRECISION DEFAULT 0;
+ALTER TABLE equipment ADD COLUMN IF NOT EXISTS cable_pulley_type VARCHAR(100) DEFAULT '';
+ALTER TABLE equipment ADD COLUMN IF NOT EXISTS cable_stack_weights DOUBLE PRECISION[] DEFAULT '{}';
+ALTER TABLE equipment ADD COLUMN IF NOT EXISTS resistance_profile_name VARCHAR(255) DEFAULT '';
 
 CREATE TABLE routines (
     id VARCHAR(255) PRIMARY KEY,

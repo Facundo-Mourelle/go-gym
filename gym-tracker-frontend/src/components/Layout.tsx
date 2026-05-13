@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { Home, History, Dumbbell, TrendingUp } from 'lucide-react';
+import { Home, History, Dumbbell, Wrench, TrendingUp } from 'lucide-react';
 
 export const Layout: React.FC = () => {
     const navigate = useNavigate();
@@ -10,6 +10,7 @@ export const Layout: React.FC = () => {
         { path: '/dashboard', icon: Home, label: 'Home' },
         { path: '/history', icon: History, label: 'History' },
         { path: '/exercises', icon: Dumbbell, label: 'Exercises' },
+        { path: '/equipment', icon: Wrench, label: 'Equipment' },
         { path: '/progress', icon: TrendingUp, label: 'Progress' },
     ];
 

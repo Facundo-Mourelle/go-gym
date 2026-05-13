@@ -70,7 +70,10 @@ func NewRouter(
 
 	// Equipment endpoints
 	equipmentHandler := handler.NewEquipmentHandler(equipmentService)
-	mux.HandleFunc("GET /api/v1/equipment", equipmentHandler.ListEquipment)
+	mux.HandleFunc("GET /api/v1/equipment", Protected(authService, equipmentHandler.ListEquipment))
+	mux.HandleFunc("POST /api/v1/equipment", Protected(authService, equipmentHandler.CreateEquipment))
+	mux.HandleFunc("PUT /api/v1/equipment/{id}", Protected(authService, equipmentHandler.UpdateEquipment))
+	mux.HandleFunc("DELETE /api/v1/equipment/{id}", Protected(authService, equipmentHandler.DeleteEquipment))
 
 	return mux
 }
