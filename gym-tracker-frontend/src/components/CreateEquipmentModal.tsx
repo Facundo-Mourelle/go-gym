@@ -119,11 +119,10 @@ export const CreateEquipmentModal: React.FC<Props> = ({ onClose, onCreated }) =>
                                     key={opt.value}
                                     type="button"
                                     onClick={() => setType(opt.value)}
-                                    className={`flex-1 py-2.5 rounded-xl text-sm font-medium border transition-colors ${
-                                        type === opt.value
+                                    className={`flex-1 py-2.5 rounded-xl text-sm font-medium border transition-colors ${type === opt.value
                                             ? 'bg-blue-600 border-blue-400 text-white ring-2 ring-blue-400/50'
                                             : 'bg-gray-700 border-gray-600 text-gray-300 hover:border-gray-500'
-                                    }`}
+                                        }`}
                                 >
                                     {opt.label}
                                 </button>
@@ -153,7 +152,7 @@ export const CreateEquipmentModal: React.FC<Props> = ({ onClose, onCreated }) =>
                         />
                     </div>
 
-                    
+
                     {type === 'freeweight' && (
                         <div>
                             <label className="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Actual Weight (kg)</label>
@@ -194,6 +193,7 @@ export const CreateEquipmentModal: React.FC<Props> = ({ onClose, onCreated }) =>
                                     <option value="1.25">1.25 kg</option>
                                     <option value="2.5">2.5 kg</option>
                                     <option value="4.5">4.5 kg (10 lb)</option>
+                                    <option value="4.5">5 kg</option>
                                 </select>
                                 <p className="text-xs text-gray-500 mt-1">The smallest increment between plates in the stack</p>
                             </div>

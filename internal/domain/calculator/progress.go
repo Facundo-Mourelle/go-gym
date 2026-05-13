@@ -17,8 +17,9 @@ type SetDataPoint struct {
 	// Raw performance data
 	Reps          int
 	EffectiveLoad float64
-	RawLoad       float64
-	EquipmentID   domain.EquipmentID
+	RawLoad         float64
+	RepsInReserve   int
+	EquipmentID     domain.EquipmentID
 
 	Score float64 // Computed by scoring formula
 }
@@ -83,8 +84,9 @@ func (p *ProgressCalculator) GenerateSetProgressData(
 				ExerciseName:  exerciseName,
 				Reps:          set.Reps,
 				EffectiveLoad: set.EffectiveLoad,
-				RawLoad:       set.RawLoad,
-				EquipmentID:   set.EquipmentID,
+				RawLoad:         set.RawLoad,
+				RepsInReserve:  set.RepsInReserve,
+				EquipmentID:    set.EquipmentID,
 				Score:         score,
 			}
 

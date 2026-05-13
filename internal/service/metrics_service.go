@@ -152,6 +152,9 @@ func toSetDataPointResponses(dataPoints []calculator.SetDataPoint) []SetDataPoin
 			Score:         dp.Score,
 			Reps:          dp.Reps,
 			EffectiveLoad: dp.EffectiveLoad,
+			RawLoad:       dp.RawLoad,
+			RepsInReserve: dp.RepsInReserve,
+			EquipmentID:   string(dp.EquipmentID),
 		}
 	}
 	return responses
@@ -210,6 +213,9 @@ type SetDataPointResponse struct {
 	Reps          int       `json:"reps"`
 	Score         float64   `json:"score"`
 	EffectiveLoad float64   `json:"effective_load"`
+	RawLoad       float64   `json:"weight"`
+	RepsInReserve int       `json:"rir"`
+	EquipmentID   string    `json:"equipment_type"`
 }
 
 type ProgressSummaryResponse struct {
