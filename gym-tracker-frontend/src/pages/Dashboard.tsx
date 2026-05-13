@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-import { Play, PlusCircle, Clock, Settings } from 'lucide-react';
+import { Play, PlusCircle, Clock, List, Dumbbell, Settings } from 'lucide-react';
 
 export const Dashboard: React.FC = () => {
     const navigate = useNavigate();
@@ -25,53 +25,62 @@ export const Dashboard: React.FC = () => {
                 </button>
             </div>
 
-            {/* Two-column layout */}
-            <div className="flex-1 px-4 pb-4 grid grid-cols-3 gap-4 min-h-0">
-                {/* Left column: Action buttons (1/3) */}
-                <div className="col-span-1 flex flex-col gap-3">
-                    <button
-                        onClick={() => navigate('/session')}
-                        className="flex-1 bg-night-surface hover:bg-night-surfaceAlt border border-night-border rounded-xl flex flex-col items-center justify-center gap-2 p-4 transition-all hover:scale-[1.02] active:scale-95 group"
-                    >
-                        <div className="p-2.5 bg-night-blue/15 rounded-full group-hover:bg-night-blue/25 transition-colors">
-                            <Play size={22} className="text-night-blue" />
-                        </div>
-                        <span className="text-sm font-semibold text-white">New Session</span>
-                    </button>
-
-                    <button
-                        onClick={() => navigate('/create-workout')}
-                        className="flex-1 bg-night-surface hover:bg-night-surfaceAlt border border-night-border rounded-xl flex flex-col items-center justify-center gap-2 p-4 transition-all hover:scale-[1.02] active:scale-95 group"
-                    >
-                        <div className="p-2.5 bg-night-teal/15 rounded-full group-hover:bg-night-teal/25 transition-colors">
-                            <PlusCircle size={22} className="text-night-teal" />
-                        </div>
-                        <span className="text-sm font-semibold text-white">Create Workout</span>
-                    </button>
-
-                    <button
-                        onClick={() => navigate('/history')}
-                        className="flex-1 bg-night-surface hover:bg-night-surfaceAlt border border-night-border rounded-xl flex flex-col items-center justify-center gap-2 p-4 transition-all hover:scale-[1.02] active:scale-95 group"
-                    >
-                        <div className="p-2.5 bg-night-purple/15 rounded-full group-hover:bg-night-purple/25 transition-colors">
-                            <Clock size={22} className="text-night-purple" />
-                        </div>
-                        <span className="text-sm font-semibold text-white">Session History</span>
-                    </button>
-                </div>
-
-                {/* Right column: Exercise Progress placeholder (2/3) */}
-                <div className="col-span-2 bg-night-surface border border-night-border rounded-xl flex flex-col items-center justify-center p-6">
-                    <div className="p-3 bg-night-surfaceAlt rounded-full mb-3">
-                        <Settings size={24} className="text-night-muted" />
+            {/* Action buttons grid */}
+            <div className="flex-1 px-4 pb-4 grid grid-cols-4 gap-3 min-h-0">
+                {/* Select From Workout */}
+                <button
+                    onClick={() => navigate('/workouts')}
+                    className="bg-night-surface hover:bg-night-surfaceAlt border border-night-border rounded-xl flex flex-col items-center justify-center gap-2 p-4 transition-all hover:scale-[1.02] active:scale-95 group"
+                >
+                    <div className="p-2.5 bg-night-orange/15 rounded-full group-hover:bg-night-orange/25 transition-colors">
+                        <List size={22} className="text-night-orange" />
                     </div>
-                    <p className="text-night-muted text-sm text-center">
-                        Exercise Progress
-                    </p>
-                    <p className="text-night-muted/50 text-xs text-center mt-1">
-                        Coming soon
-                    </p>
-                </div>
+                    <span className="text-sm font-semibold text-white">Select From Workout</span>
+                </button>
+
+                {/* Freestyle */}
+                <button
+                    onClick={() => navigate('/session')}
+                    className="bg-night-surface hover:bg-night-surfaceAlt border border-night-border rounded-xl flex flex-col items-center justify-center gap-2 p-4 transition-all hover:scale-[1.02] active:scale-95 group"
+                >
+                    <div className="p-2.5 bg-night-blue/15 rounded-full group-hover:bg-night-blue/25 transition-colors">
+                        <Play size={22} className="text-night-blue" />
+                    </div>
+                    <span className="text-sm font-semibold text-white">Freestyle</span>
+                </button>
+
+                {/* Create Workout */}
+                <button
+                    onClick={() => navigate('/create-workout')}
+                    className="bg-night-surface hover:bg-night-surfaceAlt border border-night-border rounded-xl flex flex-col items-center justify-center gap-2 p-4 transition-all hover:scale-[1.02] active:scale-95 group"
+                >
+                    <div className="p-2.5 bg-night-teal/15 rounded-full group-hover:bg-night-teal/25 transition-colors">
+                        <PlusCircle size={22} className="text-night-teal" />
+                    </div>
+                    <span className="text-sm font-semibold text-white">Create Workout</span>
+                </button>
+
+                {/* Session History */}
+                <button
+                    onClick={() => navigate('/history')}
+                    className="bg-night-surface hover:bg-night-surfaceAlt border border-night-border rounded-xl flex flex-col items-center justify-center gap-2 p-4 transition-all hover:scale-[1.02] active:scale-95 group"
+                >
+                    <div className="p-2.5 bg-night-purple/15 rounded-full group-hover:bg-night-purple/25 transition-colors">
+                        <Clock size={22} className="text-night-purple" />
+                    </div>
+                    <span className="text-sm font-semibold text-white">Session History</span>
+                </button>
+
+                {/* View Workouts */}
+                <button
+                    onClick={() => navigate('/workouts')}
+                    className="bg-night-surface hover:bg-night-surfaceAlt border border-night-border rounded-xl flex flex-col items-center justify-center gap-2 p-4 transition-all hover:scale-[1.02] active:scale-95 group"
+                >
+                    <div className="p-2.5 bg-night-green/15 rounded-full group-hover:bg-night-green/25 transition-colors">
+                        <Dumbbell size={22} className="text-night-green" />
+                    </div>
+                    <span className="text-sm font-semibold text-white">View Workouts</span>
+                </button>
             </div>
         </div>
     );
