@@ -300,8 +300,8 @@ func (r *ExercisePostgresRepository) Update(exercise domain.Exercise) error {
 	// Update exercise
 	query := `
         UPDATE exercises
-        SET name = $1, description = $2, updated_at = $4
-        WHERE id = $5
+        SET name = $1, description = $2, updated_at = $3
+        WHERE id = $4
     `
 
 	result, err := tx.Exec(

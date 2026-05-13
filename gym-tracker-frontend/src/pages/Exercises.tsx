@@ -118,15 +118,13 @@ export const Exercises: React.FC = () => {
                             <div key={ex.id} className="bg-gray-800 rounded-2xl p-4 border border-gray-700/50 hover:border-gray-600 transition-colors group">
                                 <div className="flex items-start justify-between gap-2">
                                     <h3 className="font-bold text-lg">{ex.name}</h3>
-                                    {(ex.source === 'user' || ex.is_custom) && (
-                                        <button
-                                            onClick={() => setEditingExercise(ex)}
-                                            className="p-1.5 text-gray-500 hover:text-blue-400 hover:bg-blue-400/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100 shrink-0"
-                                            title="Edit exercise"
-                                        >
-                                            <Pencil size={16} />
-                                        </button>
-                                    )}
+                                    <button
+                                        onClick={() => setEditingExercise(ex)}
+                                        className="p-1.5 text-gray-500 hover:text-blue-400 hover:bg-blue-400/10 rounded-lg transition-colors shrink-0"
+                                        title="Edit exercise"
+                                    >
+                                        <Pencil size={16} />
+                                    </button>
                                 </div>
                                 {ex.description && (
                                     <p className="text-gray-400 text-sm mt-1 line-clamp-2">{ex.description}</p>

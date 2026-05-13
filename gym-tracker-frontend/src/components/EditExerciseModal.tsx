@@ -75,7 +75,7 @@ export const EditExerciseModal: React.FC<Props> = ({ exercise, onClose, onUpdate
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60" onClick={onClose}>
+        <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center bg-black/60 pt-12 sm:pt-0" onClick={onClose}>
             <div className="bg-night-surface w-full sm:max-w-lg rounded-t-2xl sm:rounded-2xl max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
                 {/* Header */}
                 <div className="flex items-center justify-between p-5 border-b border-night-border shrink-0">
