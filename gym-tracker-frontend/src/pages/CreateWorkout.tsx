@@ -190,7 +190,7 @@ export const CreateWorkout: React.FC = () => {
         setDeleting(true);
         try {
             await workoutsApi.delete(workoutId);
-            navigate('/history');
+            navigate('/workouts');
         } catch (err) {
             console.error('Failed to delete workout:', err);
             setError('Failed to delete workout');
@@ -217,7 +217,7 @@ export const CreateWorkout: React.FC = () => {
         return (
             <div className="p-6 min-h-screen bg-gray-900 text-white">
                 <button
-                    onClick={() => navigate('/history')}
+                    onClick={() => navigate('/workouts')}
                     className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-6"
                 >
                     <ArrowLeft size={20} />
@@ -304,7 +304,7 @@ export const CreateWorkout: React.FC = () => {
     return (
         <div className="p-6 min-h-screen bg-gray-900 text-white">
             <button
-                onClick={() => navigate('/history')}
+                onClick={() => navigate('/workouts')}
                 className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-6"
             >
                 <ArrowLeft size={20} />

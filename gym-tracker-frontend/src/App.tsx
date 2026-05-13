@@ -9,6 +9,7 @@ import { Workouts } from './pages/Workouts';
 import { Metrics } from './pages/Metrics';
 import { Layout } from './components/Layout';
 import { Exercises } from './pages/Exercises';
+import { History } from './pages/History';
 import { CreateWorkout } from './pages/CreateWorkout';
 import { Equipment } from './pages/Equipment';
 
@@ -75,7 +76,8 @@ function App() {
         />
         <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/history" element={<Workouts />} />
+          <Route path="/history" element={<History />} />
+          <Route path="/workouts" element={<Workouts />} />
           <Route path="/progress" element={<Metrics />} />
           <Route path="/exercises" element={<Exercises />} />
           <Route path="/equipment" element={<Equipment />} />

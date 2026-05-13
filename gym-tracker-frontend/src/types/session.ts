@@ -8,7 +8,7 @@ export interface Session {
     workout_plan_id?: WorkoutPlanID;
     started_at: string;
     completed_at?: string;
-    duration?: number; // in seconds
+    duration?: number; // nanoseconds (Go time.Duration JSON encoding)
     notes: string;
     exercise_groups: ExerciseGroup[];
     total_sets: number;
