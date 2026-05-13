@@ -354,6 +354,8 @@ type ExerciseResponse struct {
 	SecondaryPatterns []PatternResponse      `json:"secondary_patterns"`
 	DerivedMuscles    DerivedMusclesResponse `json:"derived_muscles"`
 	Equipment         []domain.EquipmentType `json:"equipment"`
+	Source            string                 `json:"source"`
+	IsCustom          bool                   `json:"is_custom"`
 	CreatedAt         string                 `json:"created_at"`
 	UpdatedAt         string                 `json:"updated_at"`
 }
@@ -392,6 +394,11 @@ type PatternInfoResponse struct {
 // Helper functions
 
 func toExerciseResponse(ex domain.Exercise) ExerciseResponse {
+	isCustom := ex.UserID != ""
+	source := "system"
+	if isCustom {
+		source = "user"
+	}
 	return ExerciseResponse{
 		ID:                string(ex.ID),
 		Name:              ex.Name,
@@ -403,6 +410,8 @@ func toExerciseResponse(ex domain.Exercise) ExerciseResponse {
 			Secondary: ex.GetSecondaryMuscles(),
 		},
 		Equipment: ex.SuggestedEquipment,
+		Source:    source,
+		IsCustom:  isCustom,
 		CreatedAt: ex.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
 		UpdatedAt: ex.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
 	}

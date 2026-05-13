@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Dumbbell, Search, Plus, ListFilter, Pencil } from 'lucide-react';
+import { Dumbbell, Search, Plus, ListFilter, Pencil, Trash2 } from 'lucide-react';
 import { exercisesApi } from '../api/exercises';
 import { CreateExerciseModal } from '../components/CreateExerciseModal';
 import { EditExerciseModal } from '../components/EditExerciseModal';
@@ -14,6 +14,7 @@ export const Exercises: React.FC = () => {
     const [patterns, setPatterns] = useState<PatternInfo[]>([]);
     const [showCreate, setShowCreate] = useState(false);
     const [editingExercise, setEditingExercise] = useState<Exercise | null>(null);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
 
     const fetchExercises = async (search?: string, pattern?: string) => {
         setLoading(true);
@@ -27,6 +28,20 @@ export const Exercises: React.FC = () => {
             console.error("Failed to fetch exercises", err);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleDelete = async (exercise: Exercise) => {
+        if (!window.confirm(`Delete "${exercise.name}"? This cannot be undone.`)) return;
+        setDeletingId(exercise.id);
+        try {
+            await exercisesApi.delete(exercise.id);
+            fetchExercises(searchTerm || undefined, selectedPattern || undefined);
+        } catch (err) {
+            console.error('Failed to delete exercise:', err);
+            alert('Failed to delete exercise. It may be a system exercise.');
+        } finally {
+            setDeletingId(null);
         }
     };
 
@@ -118,13 +133,29 @@ export const Exercises: React.FC = () => {
                             <div key={ex.id} className="bg-gray-800 rounded-2xl p-4 border border-gray-700/50 hover:border-gray-600 transition-colors group">
                                 <div className="flex items-start justify-between gap-2">
                                     <h3 className="font-bold text-lg">{ex.name}</h3>
-                                    <button
-                                        onClick={() => setEditingExercise(ex)}
-                                        className="p-1.5 text-gray-500 hover:text-blue-400 hover:bg-blue-400/10 rounded-lg transition-colors shrink-0"
-                                        title="Edit exercise"
-                                    >
-                                        <Pencil size={16} />
-                                    </button>
+                                    <div className="flex items-center gap-1 shrink-0">
+                                        <button
+                                            onClick={() => setEditingExercise(ex)}
+                                            className="p-1.5 text-gray-500 hover:text-blue-400 hover:bg-blue-400/10 rounded-lg transition-colors shrink-0"
+                                            title="Edit exercise"
+                                        >
+                                            <Pencil size={16} />
+                                        </button>
+                                        {ex.source === 'user' && (
+                                            <button
+                                                onClick={() => handleDelete(ex)}
+                                                disabled={deletingId === ex.id}
+                                                className="p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors shrink-0 disabled:opacity-50"
+                                                title="Delete exercise"
+                                            >
+                                                {deletingId === ex.id ? (
+                                                    <div className="animate-spin h-4 w-4 border-2 border-red-400 border-t-transparent rounded-full" />
+                                                ) : (
+                                                    <Trash2 size={16} />
+                                                )}
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                                 {ex.description && (
                                     <p className="text-gray-400 text-sm mt-1 line-clamp-2">{ex.description}</p>

@@ -46,6 +46,10 @@ export const exercisesApi = {
         return response.data;
     },
 
+    delete: async (id: string): Promise<void> => {
+        await apiClient.delete(`/api/v1/exercises/${id}`);
+    },
+
     listPatterns: async (): Promise<PatternInfo[]> => {
         const response = await apiClient.get<{ patterns: PatternInfo[]; count: number }>('/api/v1/patterns');
         return response.data.patterns;

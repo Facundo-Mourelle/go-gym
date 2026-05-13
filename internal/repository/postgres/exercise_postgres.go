@@ -360,9 +360,20 @@ func (r *ExercisePostgresRepository) Update(exercise domain.Exercise) error {
 }
 
 func (r *ExercisePostgresRepository) Delete(id domain.ExerciseID) error {
-	query := `DELETE FROM exercises WHERE id = $1`
+	tx, err := r.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
 
-	result, err := r.db.Exec(query, id)
+	if _, err := tx.Exec(`DELETE FROM exercise_equipment_suggestions WHERE exercise_id = $1`, id); err != nil {
+		return err
+	}
+	if _, err := tx.Exec(`DELETE FROM exercise_pattern_contributions WHERE exercise_id = $1`, id); err != nil {
+		return err
+	}
+
+	result, err := tx.Exec(`DELETE FROM exercises WHERE id = $1`, id)
 	if err != nil {
 		return err
 	}
@@ -375,5 +386,5 @@ func (r *ExercisePostgresRepository) Delete(id domain.ExerciseID) error {
 		return repository.ErrNotFound
 	}
 
-	return nil
+	return tx.Commit()
 }
