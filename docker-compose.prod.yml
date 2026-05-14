@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: gym-db
+    environment:
+      POSTGRES_USER: ${DB_USER:-gym}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-gympassword}
+      POSTGRES_DB: ${DB_NAME:-gymtracker}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-gym}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - gym-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gym-backend
+    environment:
+      DATABASE_URL: "postgres://${DB_USER:-gym}:${DB_PASSWORD:-gympassword}@db:5432/${DB_NAME:-gymtracker}?sslmode=disable"
+      JWT_SECRET: ${JWT_SECRET}
+      PORT: 8080
+      ENVIRONMENT: ${ENVIRONMENT:-production}
+      RATE_LIMIT_ENABLED: ${RATE_LIMIT_ENABLED:-true}
+      RATE_LIMIT_REQUESTS_PER_MINUTE: ${RATE_LIMIT_REQUESTS_PER_MINUTE:-60}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000}
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - gym-network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./gym-tracker-frontend
+      dockerfile: Dockerfile
+    container_name: gym-frontend
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    depends_on:
+      - backend
+    networks:
+      - gym-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  gym-network:
+    driver: bridge
