@@ -10,6 +10,7 @@ import (
 	"database/sql"
 
 	"github.com/Facundo-Mourelle/go-gym/internal/api"
+	"github.com/Facundo-Mourelle/go-gym/internal/api/middleware"
 	"github.com/Facundo-Mourelle/go-gym/internal/config"
 	"github.com/Facundo-Mourelle/go-gym/internal/domain/calculator"
 	"github.com/Facundo-Mourelle/go-gym/internal/domain/resistance"
@@ -111,27 +112,20 @@ func main() {
 		equipmentService,
 	)
 
-	handler := corsMiddleware(router)
+	var handler http.Handler = router
 
-	// Start server
+	handler = middleware.CORSMiddleware(cfg.CORSAllowedOrigins)(handler)
+
+	if cfg.RateLimitEnabled {
+		rateLimiter := middleware.NewRateLimiter(cfg.RateLimitPerMinute)
+		handler = middleware.RateLimitMiddleware(rateLimiter)(handler)
+		log.Printf("Rate limiting enabled: %d requests per minute", cfg.RateLimitPerMinute)
+	}
+
+	handler = middleware.ContentTypeJSON(handler)
+
 	addr := fmt.Sprintf(":%s", cfg.ServerPort)
-	log.Printf("Server starting on %s", addr)
+	log.Printf("Server starting on %s (environment: %s)", addr, cfg.Environment)
 
 	log.Fatal(http.ListenAndServe(addr, handler))
-}
-
-func corsMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
-
-		// Handle preflight requests
-		if r.Method == "OPTIONS" {
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-		next.ServeHTTP(w, r)
-	})
 }
