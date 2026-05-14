@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/Facundo-Mourelle/go-gym/internal/api/middleware"
 	"github.com/Facundo-Mourelle/go-gym/internal/service"
 )
 
@@ -30,16 +31,23 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Validate input
 	if req.Email == "" || req.Password == "" {
 		http.Error(w, "Email and password are required", http.StatusBadRequest)
 		return
 	}
 
-	if len(req.Password) < 8 {
-		http.Error(w, "Password must be at least 8 characters", http.StatusBadRequest)
+	if !middleware.ValidateEmail(req.Email) {
+		http.Error(w, "Invalid email format", http.StatusBadRequest)
 		return
 	}
+
+	valid, msg := middleware.ValidatePassword(req.Password)
+	if !valid {
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+
+	req.Name = middleware.SanitizeString(req.Name)
 
 	response, err := h.authService.Register(service.RegisterRequest{
 		Email:    req.Email,
