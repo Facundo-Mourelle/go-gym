@@ -1,0 +1,40 @@
+{
+  "name": "git-practices",
+  "version": "1.0.0",
+  "description": "Strict git practices for safe development workflow",
+  "author": "opencode",
+  "created": "2026-05-14",
+  "triggers": [
+    "git commit",
+    "git push",
+    "git rebase",
+    "force push",
+    "hard reset",
+    "branch delete",
+    "tag operations",
+    "merge branches"
+  ],
+  "rules": {
+    "always_ask": [
+      "commits",
+      "pushes",
+      "rebases",
+      "force_operations",
+      "branch_deletions",
+      "merges",
+      "tag_operations"
+    ],
+    "auto_stage": true,
+    "conventional_commits": true,
+    "show_exact_command": true,
+    "error_handling": "fix_and_reauth"
+  },
+  "templates": {
+    "feat": "feat: <description>\n\n- What this feature does\n- How it works\n- Any important notes",
+    "fix": "fix: <description>\n\n- What was broken\n- How it's fixed\n- Testing notes",
+    "docs": "docs: <description>\n\n- What was added/updated\n- Location of changes\n- Related documentation",
+    "test": "test: <description>\n\n- What tests were added\n- Coverage areas\n- Test commands",
+    "refactor": "refactor: <description>\n\n- What was refactored\n- Why it was needed\n- No functional changes",
+    "chore": "chore: <description>\n\n- What maintenance task\n- Why it's needed\n- Any side effects"
+  }
+}
