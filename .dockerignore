@@ -1,0 +1,47 @@
+# Backend
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+coverage.*
+*.coverprofile
+profile.cov
+go.work
+go.work.sum
+.env
+backend.log
+nohup.out
+
+# Frontend
+gym-tracker-frontend/node_modules/
+gym-tracker-frontend/dist/
+gym-tracker-frontend/.env
+gym-tracker-frontend/frontend.log
+
+# Docker
+.dockerignore
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Database
+postgres_data/
+
+# Temporary files
+tmp/
+temp/
+.sisyphus/
