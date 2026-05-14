@@ -14,27 +14,13 @@ class ApiClient {
             },
         });
 
-        // Request interceptor - add auth token
         this.client.interceptors.request.use(
             (config: InternalAxiosRequestConfig) => {
                 const token = localStorage.getItem('auth_token');
 
-                // DETAILED DEBUG LOGGING
-                console.group('🔐 API Request');
-                console.log('URL:', config.url);
-                console.log('Method:', config.method);
-                console.log('Token in localStorage:', token ? `${token.substring(0, 20)}...` : 'NOT FOUND');
-                console.log('Headers before:', config.headers);
-
                 if (token && config.headers) {
                     config.headers.Authorization = `Bearer ${token}`;
-                    console.log('✅ Authorization header added');
-                } else {
-                    console.log('❌ No token or no headers object');
                 }
-
-                console.log('Headers after:', config.headers);
-                console.groupEnd();
 
                 return config;
             },
@@ -43,14 +29,10 @@ class ApiClient {
             }
         );
 
-        // Response interceptor - handle errors
         this.client.interceptors.response.use(
             (response) => response,
             (error: AxiosError) => {
-                console.error('❌ API Error:', error.response?.status, error.response?.data);
-
                 if (error.response?.status === 401) {
-                    console.log('🔓 Unauthorized - clearing auth and redirecting');
                     localStorage.removeItem('auth_token');
                     localStorage.removeItem('auth-storage');
                     window.location.href = '/login';

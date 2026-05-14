@@ -17,16 +17,11 @@ export const useAuthStore = create<AuthState>()(
 
             setAuth: (user, token) => {
                 localStorage.setItem('auth_token', token);
-                console.log('Token value: ', token);
-                // Verify it was saved
-                const check = localStorage.getItem('auth_token');
-                console.log('✅ Verification - token exists:', !!check);
                 set({ user, isAuthenticated: true });
             },
 
             logout: () => {
                 localStorage.removeItem('auth_token');
-                console.log('🔓 Token removed from localStorage');
                 set({ user: null, isAuthenticated: false });
             },
         }),

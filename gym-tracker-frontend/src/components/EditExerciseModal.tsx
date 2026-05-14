@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Dumbbell, Check, ChevronRight } from 'lucide-react';
+import { X, Dumbbell, Check } from 'lucide-react';
 import { exercisesApi } from '../api/exercises';
 import type { Exercise } from '../types/exercise';
 import type { PatternInfo } from '../api/exercises';
