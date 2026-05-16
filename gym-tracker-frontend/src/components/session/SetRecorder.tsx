@@ -37,7 +37,7 @@ export const SetRecorder: React.FC<SetRecorderProps> = ({
     const [weight, setWeight] = useState<number>(initialWeight ?? lastSessionWeight ?? 0);
     const [rir, setRir] = useState<number>(2);
 
-    const isCompatible = (eq: EquipmentData) => {
+    const isCompatible = React.useCallback((eq: EquipmentData) => {
         // Cables and freeweights are always shown
         if (eq.type === 'cable' || eq.type === 'freeweight') return true;
 
@@ -59,7 +59,7 @@ export const SetRecorder: React.FC<SetRecorderProps> = ({
 
         // Machine must have a movement_pattern that matches one of the exercise's patterns
         return eq.movement_pattern ? exercisePrimaryPatterns.includes(eq.movement_pattern) : false;
-    };
+    }, [equipmentTypes, exercisePrimaryPatterns]);
 
     useEffect(() => {
         equipmentApi.list().then((items) => {
@@ -71,7 +71,7 @@ export const SetRecorder: React.FC<SetRecorderProps> = ({
                 setEquipmentId(compatible[0].id);
             }
         });
-    }, []);
+    }, [equipmentTypes, exercisePrimaryPatterns, equipmentId, isCompatible]);
 
     const availableEquipment = allEquipment.filter((eq) => isCompatible(eq));
 

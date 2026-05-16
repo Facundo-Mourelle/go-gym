@@ -35,9 +35,10 @@ export const Login: React.FC = () => {
                 response.token
             );
             navigate('/dashboard');
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Login error:', err);
-            setError(err.response?.data?.message || 'Invalid email or password');
+            const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message ?? 'Invalid email or password';
+            setError(message);
         } finally {
             setIsLoading(false);
         }

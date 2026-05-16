@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { X, Wrench, Trash2 } from 'lucide-react';
-import { equipmentApi } from '../api/equipment';
-import type { EquipmentData } from '../api/equipment';
+import { equipmentApi, type CreateEquipmentData, type EquipmentData } from '../api/equipment';
 
 interface Props {
     equipment: EquipmentData;
@@ -65,31 +64,32 @@ export const EditEquipmentModal: React.FC<Props> = ({ equipment, onClose, onUpda
 
         setSaving(true);
         try {
-            const data: any = {
+            const payload: Partial<CreateEquipmentData> = {
                 name: name.trim(),
                 type,
                 manufacturer: manufacturer.trim() || undefined,
             };
 
             if (type === 'freeweight' && actualWeight) {
-                data.actual_weight = parseFloat(actualWeight);
+                payload.actual_weight = parseFloat(actualWeight);
             }
 
             if (type === 'cable') {
-                if (pulleyType) data.pulley_type = pulleyType;
-                if (weightIncrement) data.weight_increment = parseFloat(weightIncrement);
+                if (pulleyType) payload.pulley_type = pulleyType;
+                if (weightIncrement) payload.weight_increment = parseFloat(weightIncrement);
             }
 
             if (type === 'machine') {
-                if (resistanceProfileName.trim()) data.resistance_profile_name = resistanceProfileName.trim();
-                if (movementPattern) data.movement_pattern = movementPattern;
+                if (resistanceProfileName.trim()) payload.resistance_profile_name = resistanceProfileName.trim();
+                if (movementPattern) payload.movement_pattern = movementPattern;
             }
 
-            await equipmentApi.update(equipment.id, data);
+            await equipmentApi.update(equipment.id, payload);
             onUpdated();
             onClose();
-        } catch (err: any) {
-            setError(err.response?.data?.message || err.response?.data || 'Failed to update equipment');
+        } catch (err: unknown) {
+            const apiErr = err as { response?: { data?: { message?: string } } };
+            setError(apiErr.response?.data?.message ?? 'Failed to update equipment');
         } finally {
             setSaving(false);
         }
@@ -101,8 +101,9 @@ export const EditEquipmentModal: React.FC<Props> = ({ equipment, onClose, onUpda
             await equipmentApi.delete(equipment.id);
             onUpdated();
             onClose();
-        } catch (err: any) {
-            setError(err.response?.data?.message || err.response?.data || 'Failed to delete equipment');
+        } catch (err: unknown) {
+            const apiErr = err as { response?: { data?: { message?: string } } };
+            setError(apiErr.response?.data?.message ?? 'Failed to delete equipment');
         } finally {
             setDeleting(false);
             setShowDeleteConfirm(false);

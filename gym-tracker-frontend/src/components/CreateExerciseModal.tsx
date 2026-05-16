@@ -66,8 +66,9 @@ export const CreateExerciseModal: React.FC<Props> = ({ onClose, onCreated }) => 
             });
             onCreated();
             onClose();
-        } catch (err: any) {
-            setError(err.response?.data || 'Failed to create exercise');
+        } catch (err: unknown) {
+            const data = (err as { response?: { data?: string } })?.response?.data ?? 'Failed to create exercise';
+            setError(data);
         } finally {
             setSaving(false);
         }

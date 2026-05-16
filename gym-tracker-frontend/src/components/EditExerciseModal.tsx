@@ -67,8 +67,9 @@ export const EditExerciseModal: React.FC<Props> = ({ exercise, onClose, onUpdate
             });
             onUpdated();
             onClose();
-        } catch (err: any) {
-            setError(err.response?.data || 'Failed to update exercise');
+        } catch (err: unknown) {
+            const data = (err as { response?: { data?: string } })?.response?.data ?? 'Failed to update exercise';
+            setError(data);
         } finally {
             setSaving(false);
         }

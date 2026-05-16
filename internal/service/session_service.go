@@ -41,10 +41,10 @@ func (s *SessionService) StartSession(
 	if req.WorkoutPlanID != nil {
 		workout, err := s.workoutRepo.FindByID(*req.WorkoutPlanID)
 		if err != nil {
-			return StartSessionResponse{}, fmt.Errorf("Workout %v does not exist", req.WorkoutPlanID)
+			return StartSessionResponse{}, fmt.Errorf("workout %v does not exist", req.WorkoutPlanID)
 		}
 		if workout.UserID != userID {
-			return StartSessionResponse{}, fmt.Errorf("Workout %v does not belong to user %v", req.WorkoutPlanID, userID)
+			return StartSessionResponse{}, fmt.Errorf("workout %v does not belong to user %v", req.WorkoutPlanID, userID)
 		}
 	}
 
@@ -164,9 +164,6 @@ func (s *SessionService) UpdateSet(
 
 	set := session.PerformedSets[setIndex]
 
-	// Recalculate effective load if raw load or equipment changed
-	effectiveLoad := set.EffectiveLoad
-
 	if req.RawLoad != nil || req.EquipmentID != nil {
 		equipmentID := set.EquipmentID
 		if req.EquipmentID != nil {
@@ -192,7 +189,7 @@ func (s *SessionService) UpdateSet(
 			rawLoad = *req.RawLoad
 		}
 
-		effectiveLoad, err = profile.CalculateEffectiveLoad(rawLoad)
+		effectiveLoad, err := profile.CalculateEffectiveLoad(rawLoad)
 		if err != nil {
 			return RecordSetResponse{}, fmt.Errorf("failed to calculate effective load: %w", err)
 		}

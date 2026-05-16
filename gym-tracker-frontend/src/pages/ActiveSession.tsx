@@ -34,12 +34,30 @@ export const ActiveSession: React.FC = () => {
     const routineSetupDone = useRef(false);
     const workoutSetupDone = useRef(false);
 
+    const startNewSession = React.useCallback(async () => {
+        try {
+            const response = await sessionsApi.start({});
+            setActiveSession({
+                session_id: response.session_id,
+                started_at: response.started_at,
+                workout_plan_id: response.workout_plan_id,
+                exercise_groups: [],
+                total_sets: 0,
+                total_volume: 0,
+                notes: '',
+            });
+        } catch (error) {
+            console.error('Failed to start session:', error);
+            alert('Failed to start session');
+        }
+    }, [setActiveSession]);
+
     // Start session on mount if none exists
     useEffect(() => {
         if (!activeSession) {
             startNewSession();
         }
-    }, []);
+    }, [activeSession, startNewSession]);
 
     useEffect(() => {
         const routineId = searchParams.get('routineId');
@@ -66,7 +84,7 @@ export const ActiveSession: React.FC = () => {
             };
             setupFromRoutine();
         }
-    }, [searchParams, activeSession]);
+    }, [searchParams, activeSession, prepopulateExercises]);
 
     useEffect(() => {
         const workoutId = searchParams.get('workoutId');
@@ -91,7 +109,7 @@ export const ActiveSession: React.FC = () => {
             };
             setupFromWorkout();
         }
-    }, [searchParams, activeSession]);
+    }, [searchParams, activeSession, prepopulateExercises]);
 
     useEffect(() => {
         const loadLastSessionData = async () => {
@@ -114,24 +132,6 @@ export const ActiveSession: React.FC = () => {
         };
         loadLastSessionData();
     }, []);
-
-    const startNewSession = async () => {
-        try {
-            const response = await sessionsApi.start({});
-            setActiveSession({
-                session_id: response.session_id,
-                started_at: response.started_at,
-                workout_plan_id: response.workout_plan_id,
-                exercise_groups: [],
-                total_sets: 0,
-                total_volume: 0,
-                notes: '',
-            });
-        } catch (error) {
-            console.error('Failed to start session:', error);
-            alert('Failed to start session');
-        }
-    };
 
     const handleExerciseSelect = (exercise: Exercise) => {
         setSelectedExercise(exercise);

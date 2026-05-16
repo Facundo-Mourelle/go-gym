@@ -21,7 +21,7 @@ export const Register: React.FC = () => {
         if (!/[A-Z]/.test(pw)) return 'Password must contain at least one uppercase letter';
         if (!/[a-z]/.test(pw)) return 'Password must contain at least one lowercase letter';
         if (!/[0-9]/.test(pw)) return 'Password must contain at least one number';
-        if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pw)) return 'Password must contain at least one special character';
+        if (!/[!@#$%^&*()_+\-={}[\];':"|,.<>?/\\]/.test(pw)) return 'Password must contain at least one special character';
         return null;
     };
 
@@ -59,11 +59,10 @@ export const Register: React.FC = () => {
                 response.token
             );
             navigate('/dashboard');
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Registration error:', err);
-            setError(
-                err.response?.data?.message || 'Registration failed. Please try again.'
-            );
+            const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message ?? 'Registration failed. Please try again.';
+            setError(message);
         } finally {
             setIsLoading(false);
         }
@@ -75,7 +74,7 @@ export const Register: React.FC = () => {
         if (/[A-Z]/.test(password)) score++;
         if (/[a-z]/.test(password)) score++;
         if (/[0-9]/.test(password)) score++;
-        if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) score++;
+        if (!/[!@#$%^&*()_+\-={}[\];':"|,.<>?/\\]/.test(password)) score++;
         if (score >= 5) return 'strong';
         if (score >= 3) return 'medium';
         return 'weak';

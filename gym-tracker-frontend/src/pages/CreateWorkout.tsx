@@ -55,21 +55,13 @@ export const CreateWorkout: React.FC = () => {
     const [loadingExercises, setLoadingExercises] = useState(false);
     const [deleting, setDeleting] = useState(false);
 
-    // Fetch workout if in view or edit mode
-    useEffect(() => {
-        if (workoutId) {
-            fetchWorkout();
-        }
-    }, [workoutId]);
-
-    const fetchWorkout = async () => {
+    const fetchWorkout = React.useCallback(async () => {
         if (!workoutId) return;
         setLoading(true);
         setError(null);
         try {
             const data = await workoutsApi.get(workoutId);
             setWorkout(data);
-            // Populate form for edit mode
             if (isEditMode) {
                 setName(data.Name);
                 setDescription(data.Description);
@@ -89,7 +81,14 @@ export const CreateWorkout: React.FC = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [workoutId, isEditMode]);
+
+    // Fetch workout if in view or edit mode
+    useEffect(() => {
+        if (workoutId) {
+            fetchWorkout();
+        }
+    }, [workoutId, fetchWorkout]);
 
     // Open exercise modal
     const openExerciseModal = async () => {

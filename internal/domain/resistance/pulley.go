@@ -17,10 +17,10 @@ type PulleyProfile struct {
 func NewPulleyProfile(id string, pulleyConfig PulleyConfiguration, mechanicalRatio, frictionLoss float64) (*PulleyProfile, error) {
 
 	if mechanicalRatio < 1 {
-		return nil, errors.New("Invalid mechanicalRatio value: must be greater than 0")
+		return nil, errors.New("invalid mechanicalRatio value: must be greater than 0")
 	}
 	if frictionLoss < 0 || frictionLoss > 1 {
-		return nil, errors.New("Invalid frictionLoss value: must be in rrange (0,1)")
+		return nil, errors.New("invalid frictionLoss value: must be in range (0,1)")
 	}
 
 	return &PulleyProfile{
@@ -33,7 +33,7 @@ func NewPulleyProfile(id string, pulleyConfig PulleyConfiguration, mechanicalRat
 
 func (p *PulleyProfile) PulleyCalculateEffectiveLoad(rawLoad float64) (float64, error) {
 	if rawLoad < 0 {
-		return 0, errors.New("Invalid rawLoad: must be greater than 0")
+		return 0, errors.New("invalid rawLoad: must be greater than 0")
 	}
 
 	// Apply mechanical advantage

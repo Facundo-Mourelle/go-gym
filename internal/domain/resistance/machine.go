@@ -15,13 +15,13 @@ var DirectDrive = &PulleyProfile{
 
 func (m *ResistanceProfile) MachineCalculateEffectiveLoad(rawLoad float64) (float64, error) {
 	if rawLoad < 0 {
-		return 0, errors.New("Invalid rawLoad")
+		return 0, errors.New("invalid rawLoad")
 	}
 	if m.position < 0 || m.position > 1 {
-		return 0, errors.New("Invalid position: must be in range [0,1]")
+		return 0, errors.New("invalid position: must be in range [0,1]")
 	}
 	if m.pulley == nil {
-		return 0, errors.New("Pulley profile not set")
+		return 0, errors.New("pulley profile not set")
 	}
 
 	// First apply pulley mechanics
@@ -43,7 +43,7 @@ func (m *ResistanceProfile) MachineCalculateEffectiveLoad(rawLoad float64) (floa
 	case Uniform:
 		multiplier = 1
 	default:
-		return 0, errors.New("Unknown resistance profile")
+		return 0, errors.New("unknown resistance profile")
 	}
 
 	effectiveLoad := load * multiplier

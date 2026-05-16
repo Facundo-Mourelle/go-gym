@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, Wrench } from 'lucide-react';
-import { equipmentApi } from '../api/equipment';
+import { equipmentApi, type CreateEquipmentData } from '../api/equipment';
 
 interface Props {
     onClose: () => void;
@@ -61,31 +61,32 @@ export const CreateEquipmentModal: React.FC<Props> = ({ onClose, onCreated }) =>
 
         setSaving(true);
         try {
-            const data: any = {
+            const payload: Partial<CreateEquipmentData> = {
                 name: name.trim(),
                 type,
                 manufacturer: manufacturer.trim() || undefined,
             };
 
             if (type === 'freeweight' && actualWeight) {
-                data.actual_weight = parseFloat(actualWeight);
+                payload.actual_weight = parseFloat(actualWeight);
             }
 
             if (type === 'cable') {
-                if (pulleyType) data.pulley_type = pulleyType;
-                if (weightIncrement) data.weight_increment = parseFloat(weightIncrement);
+                if (pulleyType) payload.pulley_type = pulleyType;
+                if (weightIncrement) payload.weight_increment = parseFloat(weightIncrement);
             }
 
             if (type === 'machine') {
-                if (resistanceProfileName.trim()) data.resistance_profile_name = resistanceProfileName.trim();
-                if (movementPattern) data.movement_pattern = movementPattern;
+                if (resistanceProfileName.trim()) payload.resistance_profile_name = resistanceProfileName.trim();
+                if (movementPattern) payload.movement_pattern = movementPattern;
             }
 
-            await equipmentApi.create(data);
+            await equipmentApi.create(payload as CreateEquipmentData);
             onCreated();
             onClose();
-        } catch (err: any) {
-            setError(err.response?.data?.message || err.response?.data || 'Failed to create equipment');
+        } catch (err: unknown) {
+            const apiErr = err as { response?: { data?: { message?: string } } };
+            setError(apiErr.response?.data?.message ?? 'Failed to create equipment');
         } finally {
             setSaving(false);
         }
