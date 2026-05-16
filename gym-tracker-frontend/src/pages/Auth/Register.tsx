@@ -15,18 +15,28 @@ export const Register: React.FC = () => {
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
+    const validatePassword = (pw: string): string | null => {
+        if (pw.length < 8) return 'Password must be at least 8 characters long';
+        if (pw.length > 128) return 'Password must not exceed 128 characters';
+        if (!/[A-Z]/.test(pw)) return 'Password must contain at least one uppercase letter';
+        if (!/[a-z]/.test(pw)) return 'Password must contain at least one lowercase letter';
+        if (!/[0-9]/.test(pw)) return 'Password must contain at least one number';
+        if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pw)) return 'Password must contain at least one special character';
+        return null;
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
 
-        // Validation
         if (!name || !email || !password || !confirmPassword) {
             setError('Please fill in all fields');
             return;
         }
 
-        if (password.length < 8) {
-            setError('Password must be at least 8 characters');
+        const pwErr = validatePassword(password);
+        if (pwErr) {
+            setError(pwErr);
             return;
         }
 
@@ -59,7 +69,19 @@ export const Register: React.FC = () => {
         }
     };
 
-    const passwordStrength = password.length >= 8 ? 'strong' : password.length >= 6 ? 'medium' : 'weak';
+    const getPasswordStrength = (): 'strong' | 'medium' | 'weak' => {
+        let score = 0;
+        if (password.length >= 8) score++;
+        if (/[A-Z]/.test(password)) score++;
+        if (/[a-z]/.test(password)) score++;
+        if (/[0-9]/.test(password)) score++;
+        if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) score++;
+        if (score >= 5) return 'strong';
+        if (score >= 3) return 'medium';
+        return 'weak';
+    };
+
+    const passwordStrength = getPasswordStrength();
 
     return (
         <div className="min-h-screen bg-night-bg flex items-center justify-center p-4">
@@ -162,7 +184,7 @@ export const Register: React.FC = () => {
                                         <span className="text-yellow-400">Medium strength</span>
                                     )}
                                     {passwordStrength === 'weak' && (
-                                        <span className="text-red-400">Weak password (min 8 chars)</span>
+                                        <span className="text-red-400">Weak password</span>
                                     )}
                                 </div>
                             )}
