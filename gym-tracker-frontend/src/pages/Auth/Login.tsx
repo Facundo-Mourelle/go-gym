@@ -137,12 +137,14 @@ export const Login: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Demo Account Info (Optional) */}
-                <div className="mt-6 text-center">
-                    <p className="text-night-muted text-xs">
-                        Demo: demo@example.com / password123
-                    </p>
-                </div>
+                {/* Demo Account Info */}
+                {import.meta.env.VITE_DEMO_EMAIL && import.meta.env.VITE_DEMO_PASSWORD && (
+                    <div className="mt-6 text-center">
+                        <p className="text-night-muted text-xs">
+                            Demo: {import.meta.env.VITE_DEMO_EMAIL} / ••••••••
+                        </p>
+                    </div>
+                )}
             </div>
         </div>
     );
