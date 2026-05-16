@@ -3,12 +3,11 @@ version: '3.8'
 services:
   db:
     image: postgres:15-alpine
+    network_mode: host
     environment:
       POSTGRES_USER: gym
       POSTGRES_PASSWORD: gympassword
       POSTGRES_DB: gymtracker
-    ports:
-      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 

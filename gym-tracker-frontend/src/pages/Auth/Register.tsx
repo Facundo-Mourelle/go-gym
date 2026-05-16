@@ -38,15 +38,8 @@ export const Register: React.FC = () => {
         setIsLoading(true);
 
         try {
-            console.log('📝 Registering user...');
             const response = await authApi.register({ name, email, password });
-            console.log('✅ Registration successful:', response);
-            console.log('Token received:', response.token);
             localStorage.setItem('auth_token', response.token);
-            console.log('Token saved to localStorage');
-
-            const savedToken = localStorage.getItem('auth_token');
-            console.log('Verification - token in localStorage:', savedToken ? 'YES ✅' : 'NO ❌');
             setAuth(
                 {
                     user_id: response.user_id,
@@ -55,8 +48,6 @@ export const Register: React.FC = () => {
                 },
                 response.token
             );
-            console.log('Auth store updated');
-            console.log('Navigating to dashboard...');
             navigate('/dashboard');
         } catch (err: any) {
             console.error('Registration error:', err);

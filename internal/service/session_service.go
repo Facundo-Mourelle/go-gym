@@ -302,11 +302,16 @@ func (s *SessionService) CompleteSession(
 
 func (s *SessionService) GetSession(
 	sessionID domain.SessionID,
+	userID string,
 ) (SessionDetailResponse, error) {
 
 	session, err := s.sessionRepo.FindByID(sessionID)
 	if err != nil {
 		return SessionDetailResponse{}, fmt.Errorf("session not found: %w", err)
+	}
+
+	if session.UserID != userID {
+		return SessionDetailResponse{}, fmt.Errorf("unauthorized")
 	}
 
 	exerciseMap := make(map[domain.ExerciseID]domain.Exercise)

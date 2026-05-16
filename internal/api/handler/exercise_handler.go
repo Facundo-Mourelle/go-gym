@@ -189,13 +189,14 @@ func (h *ExerciseHandler) ListExercises(w http.ResponseWriter, r *http.Request) 
 // GET /api/v1/exercises/{id}
 func (h *ExerciseHandler) GetExercise(w http.ResponseWriter, r *http.Request) {
 	exerciseID := domain.ExerciseID(r.PathValue("id"))
+	userID := GetUserIDFromContext(r.Context())
 
 	if exerciseID == "" {
 		http.Error(w, "Exercise ID is required", http.StatusBadRequest)
 		return
 	}
 
-	exercise, err := h.exerciseService.GetExercise(exerciseID)
+	exercise, err := h.exerciseService.GetExercise(exerciseID, userID)
 	if err != nil {
 		http.Error(w, "Exercise not found", http.StatusNotFound)
 		return

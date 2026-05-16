@@ -16,6 +16,9 @@ type Config struct {
 	RateLimitEnabled       bool
 	RateLimitPerMinute     int
 	CORSAllowedOrigins     []string
+	TLSEnabled             bool
+	TLSCertFile            string
+	TLSKeyFile             string
 }
 
 func Load() *Config {
@@ -41,6 +44,9 @@ func Load() *Config {
 		RateLimitEnabled:   getEnvBool("RATE_LIMIT_ENABLED", true),
 		RateLimitPerMinute: getEnvInt("RATE_LIMIT_REQUESTS_PER_MINUTE", 60),
 		CORSAllowedOrigins: allowedOrigins,
+		TLSEnabled:         getEnvBool("TLS_ENABLED", false),
+		TLSCertFile:        getEnv("TLS_CERT_FILE", ""),
+		TLSKeyFile:         getEnv("TLS_KEY_FILE", ""),
 	}
 }
 

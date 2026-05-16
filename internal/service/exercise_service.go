@@ -96,11 +96,16 @@ func (s *ExerciseService) CreateFromTemplate(
 	return exercise, nil
 }
 
-func (s *ExerciseService) GetExercise(exerciseID domain.ExerciseID) (domain.Exercise, error) {
+func (s *ExerciseService) GetExercise(exerciseID domain.ExerciseID, userID string) (domain.Exercise, error) {
 	exercise, err := s.exerciseRepo.FindByID(exerciseID)
 	if err != nil {
 		return domain.Exercise{}, fmt.Errorf("exercise not found")
 	}
+
+	if exercise.UserID != userID {
+		return domain.Exercise{}, fmt.Errorf("unauthorized")
+	}
+
 	return exercise, nil
 }
 

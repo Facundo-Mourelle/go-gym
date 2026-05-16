@@ -1,9 +1,14 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/joho/godotenv"
 
@@ -37,6 +42,10 @@ func main() {
 			log.Fatalf("Failed to connect to database: %v", err)
 		}
 		defer db.Close()
+
+		db.SetMaxOpenConns(25)
+		db.SetMaxIdleConns(5)
+		db.SetConnMaxLifetime(5 * time.Minute)
 	}
 
 	var userRepo repository.UserRepository
@@ -127,5 +136,40 @@ func main() {
 	addr := fmt.Sprintf(":%s", cfg.ServerPort)
 	log.Printf("Server starting on %s (environment: %s)", addr, cfg.Environment)
 
-	log.Fatal(http.ListenAndServe(addr, handler))
+	server := &http.Server{
+		Addr:    addr,
+		Handler: handler,
+	}
+
+	go func() {
+		var err error
+		if cfg.TLSEnabled {
+			if cfg.TLSCertFile == "" || cfg.TLSKeyFile == "" {
+				log.Fatal("TLS_CERT_FILE and TLS_KEY_FILE must be set when TLS_ENABLED=true")
+			}
+			log.Printf("Starting HTTPS server on %s", addr)
+			err = server.ListenAndServeTLS(cfg.TLSCertFile, cfg.TLSKeyFile)
+		} else {
+			log.Printf("Starting HTTP server on %s", addr)
+			err = server.ListenAndServe()
+		}
+		if err != nil && err != http.ErrServerClosed {
+			log.Fatalf("Server failed: %v", err)
+		}
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+
+	log.Println("Shutting down server...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	if err := server.Shutdown(ctx); err != nil {
+		log.Fatalf("Server forced to shutdown: %v", err)
+	}
+
+	log.Println("Server exited")
 }

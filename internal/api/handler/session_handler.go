@@ -181,8 +181,9 @@ func (h *SessionHandler) CompleteSession(w http.ResponseWriter, r *http.Request)
 // GET /api/v1/sessions/{id}
 func (h *SessionHandler) GetSession(w http.ResponseWriter, r *http.Request) {
 	sessionID := domain.SessionID(r.PathValue("id"))
+	userID := GetUserIDFromContext(r.Context())
 
-	response, err := h.sessionService.GetSession(sessionID)
+	response, err := h.sessionService.GetSession(sessionID, userID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return

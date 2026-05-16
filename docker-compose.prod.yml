@@ -5,8 +5,8 @@ services:
     image: postgres:15-alpine
     container_name: gym-db
     environment:
-      POSTGRES_USER: ${DB_USER:-gym}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-gympassword}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME:-gymtracker}
     ports:
       - "${DB_PORT:-5432}:5432"
@@ -26,7 +26,7 @@ services:
       dockerfile: Dockerfile
     container_name: gym-backend
     environment:
-      DATABASE_URL: "postgres://${DB_USER:-gym}:${DB_PASSWORD:-gympassword}@db:5432/${DB_NAME:-gymtracker}?sslmode=disable"
+      DATABASE_URL: "postgres://${DB_USER:-gym}:${DB_PASSWORD:-gympassword}@db:5432/${DB_NAME:-gymtracker}?sslmode=${DB_SSLMODE:-require}"
       JWT_SECRET: ${JWT_SECRET}
       PORT: 8080
       ENVIRONMENT: ${ENVIRONMENT:-production}
