@@ -47,7 +47,7 @@ func TestValidatePassword(t *testing.T) {
 			name:     "too short",
 			password: "Short1!",
 			wantOk:   false,
-			wantMsg:  "Password must be at least 12 characters long",
+			wantMsg:  "Password must be at least 8 characters long",
 		},
 		{
 			name:     "no uppercase",

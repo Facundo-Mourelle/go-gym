@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 	"time"
 
@@ -23,6 +24,9 @@ import (
 	"github.com/Facundo-Mourelle/go-gym/internal/repository/memory"
 	"github.com/Facundo-Mourelle/go-gym/internal/repository/postgres"
 	"github.com/Facundo-Mourelle/go-gym/internal/service"
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/lib/pq"
 )
 
@@ -46,6 +50,10 @@ func main() {
 		db.SetMaxOpenConns(25)
 		db.SetMaxIdleConns(5)
 		db.SetConnMaxLifetime(5 * time.Minute)
+
+		if err := runMigrations(db, cfg.DatabaseURL); err != nil {
+			log.Fatalf("Failed to run migrations: %v", err)
+		}
 	}
 
 	var userRepo repository.UserRepository
@@ -172,4 +180,32 @@ func main() {
 	}
 
 	log.Println("Server exited")
+}
+
+func runMigrations(db *sql.DB, databaseURL string) error {
+	migrationsPath, err := filepath.Abs("internal/repository/postgres/migrations")
+	if err != nil {
+		return fmt.Errorf("failed to resolve migrations path: %w", err)
+	}
+
+	m, err := migrate.New(
+		"file://"+migrationsPath,
+		databaseURL,
+	)
+	if err != nil {
+		return fmt.Errorf("failed to create migrate instance: %w", err)
+	}
+
+	err = m.Up()
+	if err != nil && err != migrate.ErrNoChange {
+		return fmt.Errorf("failed to run migrations: %w", err)
+	}
+
+	if err == migrate.ErrNoChange {
+		log.Println("Database schema is up to date")
+	} else {
+		log.Println("Database migrations applied successfully")
+	}
+
+	return nil
 }

@@ -17,8 +17,8 @@ func ValidateEmail(email string) bool {
 }
 
 func ValidatePassword(password string) (bool, string) {
-	if len(password) < 12 {
-		return false, "Password must be at least 12 characters long"
+	if len(password) < 8 {
+		return false, "Password must be at least 8 characters long"
 	}
 
 	if len(password) > 128 {

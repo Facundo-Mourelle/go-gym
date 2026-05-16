@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -31,7 +32,12 @@ func NewAuthService(userRepo repository.UserRepository, routineService *RoutineS
 // Register creates a new user account
 func (s *AuthService) Register(req RegisterRequest) (AuthResponse, error) {
 	// Check if user already exists
-	existingUser, _ := s.userRepo.FindByEmail(req.Email)
+	existingUser, err := s.userRepo.FindByEmail(req.Email)
+	if err != nil {
+		if !errors.Is(err, repository.ErrNotFound) {
+			return AuthResponse{}, fmt.Errorf("database error: %w", err)
+		}
+	}
 	if existingUser != nil {
 		return AuthResponse{}, fmt.Errorf("email already registered")
 	}
