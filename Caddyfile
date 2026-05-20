@@ -1,0 +1,39 @@
+# Caddyfile for Go Gym - Production
+# Handles reverse proxy, CORS, and security headers
+
+{$DOMAIN} {
+    encode gzip
+
+    # Serve frontend
+    reverse_proxy /* frontend:80
+
+    # Proxy API requests to backend
+    reverse_proxy /api/* backend:8080
+
+    # Security headers
+    header {
+        Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "no-referrer-when-downgrade"
+    }
+}
+
+{$API_DOMAIN} {
+    encode gzip
+    reverse_proxy backend:8080
+
+    # CORS headers for API
+    header {
+        Access-Control-Allow-Origin "https://{$DOMAIN}"
+        Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+        Access-Control-Allow-Headers "Content-Type, Authorization"
+        Access-Control-Expose-Headers "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Cache-Control, Content-Language, Content-Type, Expires, Last-Modified, Pragma"
+        Access-Control-Allow-Credentials "true"
+        Access-Control-Max-Age "3600"
+    }
+
+    # Handle preflight requests
+    @options method OPTIONS
+    respond @options 204
+}
