@@ -20,52 +20,42 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-echo "=== Initializing Go Gym ==="
+echo "=== Starting Go Gym (Docker Dev) ==="
 
-# 1. Start DB (docker-compose)
-echo "[1/3] Starting PostgreSQL..."
-docker-compose up -d
+# Build and start all services
+echo "[1/1] Starting all services..."
+docker compose up -d --build
 
-echo "Waiting for PostgreSQL to be ready..."
+echo "Waiting for services to be ready..."
 for i in {1..30}; do
-  if docker-compose exec -T db pg_isready -U gym > /dev/null 2>&1; then
-    echo "PostgreSQL is ready!"
+  if docker compose exec -T db pg_isready -U gym > /dev/null 2>&1; then
+    echo "All services ready!"
     break
   fi
   echo "  Waiting... ($i/30)"
   sleep 1
 done
 
-if ! docker-compose exec -T db pg_isready -U gym > /dev/null 2>&1; then
-  echo "WARNING: PostgreSQL not confirmed ready after 30s. Backend may fail."
-fi
-
-# 2. Start backend
-echo "[2/3] Starting Go API..."
-./start_backend.sh
-sleep 2
-
-# 3. Start frontend
-echo "[3/3] Starting React frontend..."
-./start_frontend.sh
-
 echo ""
 echo "=== Services running ==="
+echo "Caddy:   http://localhost"
+echo "Backend: http://localhost/api (proxied via Caddy)"
+echo "Frontend: http://localhost (proxied via Caddy)"
 echo "DB:      localhost:5432"
-echo "Backend: localhost:8080"
-echo "Frontend: http://localhost:5173"
+echo ""
+echo "View logs: docker compose logs -f"
+echo "Stop:      docker compose down"
 echo ""
 
 if [ "$RUN_TESTS" = true ]; then
   echo "=== Running tests ==="
 
   echo "[Backend] Running Go tests..."
-  go test ./... -v
+  docker compose exec backend go test ./... -v
 
   echo ""
   echo "[Frontend] Running React tests..."
-  cd gym-tracker-frontend
-  npm test -- --run
+  docker compose exec frontend pnpm test -- --run
 
   echo ""
   echo "=== All tests passed ==="

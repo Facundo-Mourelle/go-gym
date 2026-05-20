@@ -1,0 +1,26 @@
+# Dev Caddyfile
+# Proxies to backend and frontend containers
+
+:80 {
+    encode gzip
+
+    # API requests -> backend
+    reverse_proxy /api/* backend:8080
+
+    # Everything else -> frontend (Vite dev server)
+    reverse_proxy /* frontend:5173
+
+    # CORS for API
+    @api path /api/*
+    header @api {
+        Access-Control-Allow-Origin *
+        Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+        Access-Control-Allow-Headers "Content-Type, Authorization"
+        Access-Control-Allow-Credentials "true"
+        Access-Control-Max-Age "3600"
+    }
+
+    # Handle preflight
+    @options method OPTIONS
+    respond @options 204
+}

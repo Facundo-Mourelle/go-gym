@@ -1,15 +1,78 @@
-version: '3.8'
-
 services:
   db:
     image: postgres:15-alpine
-    network_mode: host
     environment:
       POSTGRES_USER: gym
       POSTGRES_PASSWORD: gympassword
       POSTGRES_DB: gymtracker
+    ports:
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gym"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - gym-dev
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: gym-dev-backend
+    environment:
+      DATABASE_URL: "postgres://gym:gympassword@db:5432/gymtracker?sslmode=disable"
+      JWT_SECRET: "dev-secret-key-not-for-production"
+      PORT: 8080
+      ENVIRONMENT: development
+      CORS_ALLOWED_ORIGINS: "http://localhost,http://localhost:80,http://127.0.0.1,http://127.0.0.1:80"
+    volumes:
+      - .:/app
+      - go-mod-cache:/go/pkg/mod
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - gym-dev
+
+  frontend:
+    build:
+      context: ./gym-tracker-frontend
+      dockerfile: Dockerfile.dev
+    container_name: gym-dev-frontend
+    environment:
+      VITE_API_URL: "http://localhost/api"
+    volumes:
+      - ./gym-tracker-frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - gym-dev
+
+  caddy:
+    image: caddy:2
+    container_name: gym-dev-caddy
+    ports:
+      - "80:80"
+    volumes:
+      - ./Caddyfile.dev:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - gym-dev
 
 volumes:
   postgres_data:
+  go-mod-cache:
+  caddy_data:
+  caddy_config:
+
+networks:
+  gym-dev:
+    driver: bridge
