@@ -163,7 +163,7 @@ Análisis de Arquitectura en forma "Bottom-Up" implementada bajo principios de c
 internal/
 ├── api/           # Handlers HTTP, router, middleware
 │   ├── handler/   # Auth, Exercise, Session, Workout, Routine, Metrics, Equipment
-│   └── middleware/ # JWT, CORS, logging
+│   └── middleware/ # JWT, logging
 ├── config/        # Configuración (JWT, puerto, DB)
 ├── domain/        # Modelo de dominio puro
 │   ├── calculator/ # Cálculos de volumen, 1RM, etc.
