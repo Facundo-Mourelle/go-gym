@@ -29,7 +29,7 @@ func Load() *Config {
 
 	environment := getEnv("ENVIRONMENT", "development")
 	
-	corsOrigins := getEnv("CORS_ALLOWED_ORIGINS", "http://localhost:5173")
+	corsOrigins := os.Getenv("CORS_ALLOWED_ORIGINS")
 	allowedOrigins := strings.Split(corsOrigins, ",")
 	for i := range allowedOrigins {
 		allowedOrigins[i] = strings.TrimSpace(allowedOrigins[i])
