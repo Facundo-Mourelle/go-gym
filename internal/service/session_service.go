@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/Facundo-Mourelle/go-gym/internal/domain"
@@ -52,6 +53,8 @@ func (s *SessionService) StartSession(
 	if req.WorkoutPlanID != nil {
 		workoutPlanID = *req.WorkoutPlanID
 	}
+
+	log.Printf("StartSession: workoutPlanID=%q (len=%d)", workoutPlanID, len(workoutPlanID))
 
 	session := domain.Session{
 		ID:            domain.SessionID(generateID()),

@@ -29,11 +29,16 @@ func (r *SessionPostgresRepository) Create(session domain.Session) error {
 		return err
 	}
 
+	var workoutPlanID interface{} = nil
+	if len(session.WorkoutPlanID) > 0 {
+		workoutPlanID = string(session.WorkoutPlanID)
+	}
+
 	_, err = r.db.Exec(
 		query,
 		session.ID,
 		session.UserID,
-		session.WorkoutPlanID,
+		workoutPlanID,
 		session.StartedAt,
 		session.CompletedAt,
 		performedSetsJSON,
@@ -186,9 +191,14 @@ func (r *SessionPostgresRepository) Update(session domain.Session) error {
 		return err
 	}
 
+	var workoutPlanID interface{} = nil
+	if len(session.WorkoutPlanID) > 0 {
+		workoutPlanID = string(session.WorkoutPlanID)
+	}
+
 	_, err = r.db.Exec(
 		query,
-		session.WorkoutPlanID,
+		workoutPlanID,
 		session.CompletedAt,
 		performedSetsJSON,
 		session.Notes,
