@@ -132,13 +132,6 @@ func main() {
 	var handler http.Handler = router
 
 	handler = middleware.CORSMiddleware(cfg.CORSAllowedOrigins)(handler)
-
-	if cfg.RateLimitEnabled {
-		rateLimiter := middleware.NewRateLimiter(cfg.RateLimitPerMinute)
-		handler = middleware.RateLimitMiddleware(rateLimiter)(handler)
-		log.Printf("Rate limiting enabled: %d requests per minute", cfg.RateLimitPerMinute)
-	}
-
 	handler = middleware.ContentTypeJSON(handler)
 
 	addr := fmt.Sprintf(":%s", cfg.ServerPort)

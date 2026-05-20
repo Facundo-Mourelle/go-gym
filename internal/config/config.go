@@ -13,8 +13,6 @@ type Config struct {
 	ServerPort             string
 	DatabaseURL            string
 	Environment            string
-	RateLimitEnabled       bool
-	RateLimitPerMinute     int
 	CORSAllowedOrigins     []string
 	TLSEnabled             bool
 	TLSCertFile            string
@@ -29,7 +27,7 @@ func Load() *Config {
 
 	environment := getEnv("ENVIRONMENT", "development")
 	
-	corsOrigins := os.Getenv("CORS_ALLOWED_ORIGINS")
+	corsOrigins := getEnv("CORS_ALLOWED_ORIGINS", "")
 	allowedOrigins := strings.Split(corsOrigins, ",")
 	for i := range allowedOrigins {
 		allowedOrigins[i] = strings.TrimSpace(allowedOrigins[i])
@@ -41,8 +39,6 @@ func Load() *Config {
 		ServerPort:         getEnv("PORT", "8080"),
 		DatabaseURL:        getEnv("DATABASE_URL", ""),
 		Environment:        environment,
-		RateLimitEnabled:   getEnvBool("RATE_LIMIT_ENABLED", true),
-		RateLimitPerMinute: getEnvInt("RATE_LIMIT_REQUESTS_PER_MINUTE", 60),
 		CORSAllowedOrigins: allowedOrigins,
 		TLSEnabled:         getEnvBool("TLS_ENABLED", false),
 		TLSCertFile:        getEnv("TLS_CERT_FILE", ""),
