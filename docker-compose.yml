@@ -10,7 +10,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U gym"]
+      test: ["CMD-SHELL", "pg_isready -U gym -d gymtracker"]
       interval: 5s
       timeout: 3s
       retries: 5
@@ -43,7 +43,7 @@ services:
       dockerfile: Dockerfile.dev
     container_name: gym-dev-frontend
     environment:
-      VITE_API_URL: "http://localhost/api"
+      VITE_API_URL: "http://100.78.74.104"
     volumes:
       - ./gym-tracker-frontend:/app
       - /app/node_modules
